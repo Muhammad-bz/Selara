@@ -22,9 +22,9 @@ export default function ProtectedRoute({ children }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#FAF6EF",
-        fontFamily: "'DM Sans', system-ui, sans-serif",
-        color: "#7A6558",
+        background: "#FDF8F5",
+        fontFamily: "'Jost', system-ui, sans-serif",
+        color: "#9A8A8A",
         fontSize: 14,
       }}>
         Loading…

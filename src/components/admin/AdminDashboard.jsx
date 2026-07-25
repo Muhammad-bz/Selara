@@ -4,17 +4,17 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 const C = {
-  cream:     "#FAF6EF",
-  creamDeep: "#F0E9DC",
-  chocolate: "#5C3317",
-  espresso:  "#2E1A0E",
-  gold:      "#C9A84C",
-  caramel:   "#C8956B",
-  mist:      "#7A6558",
-  line:      "rgba(92,51,23,0.12)",
+  cream:     "#FDF8F5",
+  creamDeep: "#F7EEE9",
+  chocolate: "#C9818F",
+  espresso:  "#1C1C1C",
+  gold:      "#C9818F",
+  caramel:   "#E8A0B0",
+  mist:      "#9A8A8A",
+  line:      "rgba(201,129,143,0.15)",
 };
 const FONT_DISPLAY = "'Cormorant Garamond', Georgia, serif";
-const FONT_BODY    = "'DM Sans', system-ui, sans-serif";
+const FONT_BODY    = "'Jost', system-ui, sans-serif";
 
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
@@ -26,17 +26,17 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: C.creamDeep, fontFamily: FONT_BODY }}>
+    <div style={{ minHeight: "100vh", background: "#F7EEE9", fontFamily: FONT_BODY }}>
       {/* Top bar */}
       <header style={{
-        background: C.espresso,
+        background: "#1C1C1C",
         padding: "0 32px",
         height: 60,
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
       }}>
-        <span style={{ fontFamily: FONT_DISPLAY, fontSize: 22, color: C.gold, fontWeight: 400 }}>
+        <span style={{ fontFamily: FONT_DISPLAY, fontSize: 22, color: "#F2C4CE", fontWeight: 400 }}>
           Cremeo Admin
         </span>
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
@@ -48,9 +48,9 @@ export default function AdminDashboard() {
             style={{
               padding: "6px 16px",
               background: "transparent",
-              border: `1px solid rgba(201,168,76,0.5)`,
+              border: `1px solid rgba(201,129,143,0.5)`,
               borderRadius: 3,
-              color: C.gold,
+              color: "#F2C4CE",
               fontFamily: FONT_BODY,
               fontSize: 12,
               fontWeight: 600,
@@ -59,8 +59,8 @@ export default function AdminDashboard() {
               cursor: "pointer",
               transition: "border-color 0.2s, color 0.2s",
             }}
-            onMouseEnter={(e) => { e.target.style.borderColor = C.gold; e.target.style.color = C.gold; }}
-            onMouseLeave={(e) => { e.target.style.borderColor = "rgba(201,168,76,0.5)"; }}
+            onMouseEnter={(e) => { e.target.style.borderColor = "#C9818F"; e.target.style.color = "#F2C4CE"; }}
+            onMouseLeave={(e) => { e.target.style.borderColor = "rgba(201,129,143,0.5)"; }}
           >
             Logout
           </button>
@@ -69,20 +69,20 @@ export default function AdminDashboard() {
 
       {/* Content */}
       <main style={{ padding: "48px 32px", maxWidth: 900, margin: "0 auto" }}>
-        <h1 style={{ fontFamily: FONT_DISPLAY, fontSize: 36, fontWeight: 400, color: C.espresso, marginBottom: 8 }}>
+        <h1 style={{ fontFamily: FONT_DISPLAY, fontSize: 34, fontWeight: 400, fontStyle: "italic", color: C.espresso, marginBottom: 6, letterSpacing: "0.02em" }}>
           Dashboard
         </h1>
-        <div style={{ width: 56, height: 1.5, background: C.gold, marginBottom: 32 }} />
+        <div style={{ width: 40, height: 1, background: "#C9818F", marginBottom: 32, opacity: 0.6 }} />
 
         <div style={{
           background: "#fff",
-          border: `1px solid ${C.line}`,
+          border: `1px solid rgba(201,129,143,0.15)`,
           borderRadius: 6,
           padding: 32,
-          boxShadow: "0 2px 12px rgba(46,26,14,0.06)",
+          boxShadow: "0 2px 12px rgba(201,129,143,0.06)",
         }}>
           <p style={{ color: C.mist, fontSize: 15, lineHeight: 1.6 }}>
-            Welcome back! You're signed in as <strong style={{ color: C.chocolate }}>{user?.email}</strong>.
+            Welcome back! You're signed in as <strong style={{ color: "#C9818F" }}>{user?.email}</strong>.
           </p>
           <p style={{ color: C.mist, fontSize: 14, marginTop: 12 }}>
             Build your admin features here — this route is fully protected by Firebase Authentication.

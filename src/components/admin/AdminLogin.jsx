@@ -4,17 +4,17 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 const C = {
-  cream:     "#FAF6EF",
-  creamDeep: "#F0E9DC",
-  chocolate: "#5C3317",
-  espresso:  "#2E1A0E",
-  gold:      "#C9A84C",
-  caramel:   "#C8956B",
-  mist:      "#7A6558",
-  line:      "rgba(92,51,23,0.12)",
+  cream:     "#FDF8F5",
+  creamDeep: "#F7EEE9",
+  chocolate: "#C9818F",
+  espresso:  "#1C1C1C",
+  gold:      "#C9818F",
+  caramel:   "#E8A0B0",
+  mist:      "#9A8A8A",
+  line:      "rgba(201,129,143,0.15)",
 };
 const FONT_DISPLAY = "'Cormorant Garamond', Georgia, serif";
-const FONT_BODY    = "'DM Sans', system-ui, sans-serif";
+const FONT_BODY    = "'Jost', system-ui, sans-serif";
 
 export default function AdminLogin() {
   const { login }    = useAuth();
@@ -41,7 +41,7 @@ export default function AdminLogin() {
   return (
     <div style={{
       minHeight: "100vh",
-      background: `linear-gradient(135deg, ${C.cream} 0%, ${C.creamDeep} 100%)`,
+      background: `linear-gradient(135deg, #FDF8F5 0%, #F7EEE9 100%)`,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
@@ -53,16 +53,16 @@ export default function AdminLogin() {
         width: "100%",
         maxWidth: 420,
         background: "#fff",
-        border: `1px solid ${C.line}`,
+        border: `1px solid rgba(201,129,143,0.15)`,
         borderRadius: 16,
         overflow: "hidden",
-        boxShadow: "0 20px 60px rgba(46,26,14,0.10), 0 4px 16px rgba(46,26,14,0.06)",
+        boxShadow: "0 20px 60px rgba(201,129,143,0.10), 0 4px 16px rgba(201,129,143,0.06)",
       }}>
 
         {/* Top accent strip */}
         <div style={{
           height: 4,
-          background: `linear-gradient(90deg, ${C.chocolate}, ${C.gold}, ${C.caramel})`,
+          background: `linear-gradient(90deg, #1C1C1C, #C9818F, #F2C4CE)`,
         }} />
 
         <div style={{ padding: "44px 40px 40px" }}>
@@ -71,14 +71,14 @@ export default function AdminLogin() {
           <div style={{ textAlign: "center", marginBottom: 36 }}>
             <div style={{
               width: 56, height: 56,
-              background: C.espresso,
+              background: "#1C1C1C",
               borderRadius: 14,
               margin: "0 auto 18px",
               display: "flex", alignItems: "center", justifyContent: "center",
-              boxShadow: `0 4px 16px rgba(46,26,14,0.22)`,
+              boxShadow: `0 4px 16px rgba(28,12,18,0.22)`,
             }}>
               {/* Store bag icon */}
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={C.gold} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#F2C4CE" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
                 <line x1="3" y1="6" x2="21" y2="6"/>
                 <path d="M16 10a4 4 0 01-8 0"/>
@@ -88,9 +88,10 @@ export default function AdminLogin() {
               fontFamily: FONT_DISPLAY,
               fontSize: 30,
               fontWeight: 400,
+              fontStyle: "italic",
               color: C.espresso,
               margin: "0 0 6px",
-              letterSpacing: "0.01em",
+              letterSpacing: "0.02em",
             }}>
               Admin Portal
             </h1>
@@ -157,8 +158,8 @@ export default function AdminLogin() {
                 marginTop: 6,
                 width: "100%",
                 padding: "14px",
-                background: busy ? C.mist : C.espresso,
-                color: C.cream,
+                background: busy ? "#9A8A8A" : "#1C1C1C",
+                color: "#FDF8F5",
                 border: "none",
                 borderRadius: 8,
                 fontFamily: FONT_BODY,
@@ -194,7 +195,7 @@ export default function AdminLogin() {
             textAlign: "center",
           }}>
             <a href="/" style={{
-              color: C.caramel,
+              color: "#C9818F",
               textDecoration: "none",
               fontSize: 12,
               fontWeight: 500,
@@ -213,6 +214,7 @@ export default function AdminLogin() {
       </div>
 
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap');
         @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
     </div>
@@ -225,19 +227,19 @@ const labelStyle = {
   fontWeight: 700,
   letterSpacing: "0.07em",
   textTransform: "uppercase",
-  color: "#7A6558",
+  color: "#9A8A8A",
   marginBottom: 7,
 };
 
 const inputStyle = {
   width: "100%",
   padding: "11px 14px",
-  border: "1px solid rgba(92,51,23,0.18)",
+  border: "1px solid rgba(201,129,143,0.20)",
   borderRadius: 8,
-  fontFamily: "'DM Sans', system-ui, sans-serif",
+  fontFamily: "'Jost', system-ui, sans-serif",
   fontSize: 14,
-  color: "#2E1A0E",
-  background: "#FAF6EF",
+  color: "#1C1C1C",
+  background: "#FDF8F5",
   outline: "none",
   boxSizing: "border-box",
   transition: "border-color 0.18s, box-shadow 0.18s",
