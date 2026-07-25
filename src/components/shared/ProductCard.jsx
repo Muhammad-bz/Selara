@@ -205,6 +205,29 @@ const ProductCard = memo(function ProductCard({ product, onAdd, wishlist, toggle
           </p>
         )}
 
+        {/* Add-ons */}
+        {Array.isArray(product.addons) && product.addons.length > 0 && (
+          <div style={{ marginBottom: 8 }}>
+            {product.addons.map((addon, i) => (
+              addon.name ? (
+                <p key={i} style={{
+                  fontFamily: FONT_BODY, fontSize: 11, fontWeight: 400,
+                  color: C.mist, lineHeight: 1.5,
+                  display: "flex", alignItems: "center", gap: 4,
+                }}>
+                  <span style={{ color: C.rose, fontWeight: 500 }}>+</span>
+                  {addon.name}
+                  {addon.price ? (
+                    <span style={{ color: C.slate }}>
+                      — PKR {Number(addon.price).toLocaleString()}
+                    </span>
+                  ) : null}
+                </p>
+              ) : null
+            ))}
+          </div>
+        )}
+
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: "auto", paddingTop: 8 }}>
           <span style={{ fontFamily: FONT_DISPLAY, fontSize: 18, fontWeight: 400, color: C.slate, flexShrink: 0 }}>
             {fmt(product.price)}

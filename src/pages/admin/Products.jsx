@@ -113,6 +113,7 @@ const EMPTY_FORM = {
   imageUrl:    "",
   images:      [],
   mainImage:   "",
+  addons:      [],
 };
 
 /* ═══════════════════════════════════════════════
@@ -173,6 +174,7 @@ function useProducts() {
       imageUrl:    data.imageUrl.trim(),
       images:      data.images ?? [],
       mainImage:   data.mainImage ?? "",
+      addons:      data.addons ?? [],
       createdAt:   serverTimestamp(),
     });
   }, []);
@@ -188,6 +190,7 @@ function useProducts() {
       imageUrl:    data.imageUrl.trim(),
       images:      data.images ?? [],
       mainImage:   data.mainImage ?? "",
+      addons:      data.addons ?? [],
     });
   }, []);
 
@@ -685,6 +688,54 @@ function ProductsStyles() {
         letter-spacing: 0.04em; flex-shrink: 0;
       }
 
+      /* Add-ons section */
+      .crm-addon-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        background: #fff;
+        border: 1px solid ${C.line};
+        border-radius: 6px;
+        margin-bottom: 6px;
+        animation: crmFadeUp 0.2s ease both;
+      }
+      .crm-addon-thumb {
+        width: 36px; height: 36px;
+        border-radius: 4px; object-fit: cover;
+        border: 1px solid ${C.line}; flex-shrink: 0;
+        background: ${C.creamDeep};
+      }
+      .crm-addon-thumb-placeholder {
+        width: 36px; height: 36px;
+        border-radius: 4px;
+        background: ${C.creamDeep};
+        border: 1px dashed ${C.line};
+        flex-shrink: 0; display: flex;
+        align-items: center; justify-content: center;
+        cursor: pointer; transition: border-color 0.15s;
+      }
+      .crm-addon-thumb-placeholder:hover { border-color: #C9818F; }
+      .crm-addon-input {
+        flex: 1; padding: 7px 10px;
+        font-family: ${FONT_BODY}; font-size: 13px;
+        color: ${C.espresso}; background: ${C.creamDeep};
+        border: 1px solid ${C.line}; border-radius: 5px;
+        outline: none; min-width: 0;
+        transition: border-color 0.16s, box-shadow 0.16s;
+      }
+      .crm-addon-input:focus { border-color: #C9818F; box-shadow: 0 0 0 2px rgba(201,129,143,0.12); background: #fff; }
+      .crm-addon-price {
+        width: 96px; flex-shrink: 0;
+      }
+      .crm-addon-del {
+        background: none; border: none; cursor: pointer;
+        color: ${C.mist}; padding: 4px; border-radius: 4px;
+        display: flex; align-items: center; flex-shrink: 0;
+        transition: color 0.15s, background 0.15s;
+      }
+      .crm-addon-del:hover { color: ${C.red}; background: ${C.redBg}; }
+
       /* Reduced motion */
       @media (prefers-reduced-motion: reduce) {
         .crm-page, .crm-table tbody tr, .crm-card,
@@ -820,6 +871,87 @@ async function uploadToCloudinary(file, onProgress) {
 /* ─────────────────────────────────────────────────
    PRODUCT MODAL  (Add / Edit)
 ───────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────
+   ADDON ROW  (inline editor inside ProductModal)
+───────────────────────────────────────────────── */
+function AddonRow({ addon, idx, onChange, onRemove, disabled }) {
+  const fileRef = useRef(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadErr, setUploadErr] = useState("");
+
+  const handleImageFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (fileRef.current) fileRef.current.value = "";
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { setUploadErr("Images only."); return; }
+    setUploading(true); setUploadErr("");
+    try {
+      const url = await uploadToCloudinary(file, () => {});
+      onChange({ ...addon, imageUrl: url });
+    } catch (err) {
+      setUploadErr("Upload failed.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className="crm-addon-row">
+      {/* Thumbnail / upload trigger */}
+      <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleImageFile} />
+      {addon.imageUrl ? (
+        <img
+          src={addon.imageUrl}
+          alt=""
+          className="crm-addon-thumb"
+          title="Click to change image"
+          style={{ cursor: "pointer" }}
+          onClick={() => !disabled && !uploading && fileRef.current?.click()}
+        />
+      ) : (
+        <div
+          className="crm-addon-thumb-placeholder"
+          title="Upload image (optional)"
+          onClick={() => !disabled && !uploading && fileRef.current?.click()}
+        >
+          {uploading
+            ? <span style={{ fontSize: 8, color: C.mist }}>…</span>
+            : <Upload size={13} color={C.mist} opacity={0.5} />}
+        </div>
+      )}
+
+      {/* Name */}
+      <input
+        className="crm-addon-input"
+        placeholder="Add-on name (e.g. Dupatta)"
+        value={addon.name}
+        disabled={disabled}
+        onChange={(e) => onChange({ ...addon, name: e.target.value })}
+      />
+
+      {/* Price */}
+      <input
+        className="crm-addon-input crm-addon-price"
+        placeholder="Price (Rs.)"
+        type="number"
+        min="0"
+        value={addon.price}
+        disabled={disabled}
+        onChange={(e) => onChange({ ...addon, price: e.target.value })}
+      />
+
+      {/* Remove */}
+      <button className="crm-addon-del" onClick={onRemove} disabled={disabled} aria-label="Remove add-on">
+        <Trash2 size={13} />
+      </button>
+
+      {uploadErr && (
+        <span style={{ fontSize: 10, color: C.red, position: "absolute", marginTop: 40 }}>{uploadErr}</span>
+      )}
+    </div>
+  );
+}
+
 function ProductModal({ mode, initial, onSave, onClose }) {
   // Normalise initial: populate images/mainImage from legacy imageUrl if needed
   const normaliseInitial = (src) => {
@@ -832,6 +964,7 @@ function ProductModal({ mode, initial, onSave, onClose }) {
     if (!base.mainImage && base.images.length > 0) {
       base.mainImage = base.images[0];
     }
+    if (!Array.isArray(base.addons)) base.addons = [];
     return base;
   };
 
@@ -1104,6 +1237,50 @@ function ProductModal({ mode, initial, onSave, onClose }) {
                 </span>
               </div>
             )}
+          </div>
+
+          {/* ── Add-ons ── */}
+          <div className="crm-field">
+            <label className="crm-label" style={{ marginBottom: 10 }}>
+              Add-ons
+              <span style={{ fontWeight: 400, color: C.mist, textTransform: "none", letterSpacing: 0, marginLeft: 6 }}>
+                (optional — e.g. Dupatta, Belt, Bag)
+              </span>
+            </label>
+
+            {form.addons.map((addon, idx) => (
+              <AddonRow
+                key={idx}
+                addon={addon}
+                idx={idx}
+                disabled={saving || uploading}
+                onChange={(updated) =>
+                  setForm((f) => {
+                    const next = [...f.addons];
+                    next[idx] = updated;
+                    return { ...f, addons: next };
+                  })
+                }
+                onRemove={() =>
+                  setForm((f) => ({ ...f, addons: f.addons.filter((_, i) => i !== idx) }))
+                }
+              />
+            ))}
+
+            <button
+              type="button"
+              className="crm-upload-btn"
+              style={{ marginTop: form.addons.length ? 4 : 0 }}
+              disabled={saving || uploading}
+              onClick={() =>
+                setForm((f) => ({
+                  ...f,
+                  addons: [...f.addons, { name: "", price: "", imageUrl: "" }],
+                }))
+              }
+            >
+              <Plus size={13} /> Add Add-on
+            </button>
           </div>
 
           {/* Toggles */}

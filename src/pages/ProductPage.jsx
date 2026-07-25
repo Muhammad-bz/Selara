@@ -572,6 +572,40 @@ export default function ProductPage() {
               {fmt(product.price)}
             </p>
 
+            {/* Add-ons */}
+            {Array.isArray(product.addons) && product.addons.filter(a => a.name).length > 0 && (
+              <div style={{ marginBottom: 20 }}>
+                {product.addons.filter(a => a.name).map((addon, i) => (
+                  <div key={i} style={{
+                    display: "flex", alignItems: "center", gap: 10,
+                    marginBottom: 8,
+                  }}>
+                    {addon.imageUrl && (
+                      <img
+                        src={addon.imageUrl}
+                        alt={addon.name}
+                        style={{
+                          width: 38, height: 38, objectFit: "cover",
+                          border: `1px solid ${C.line}`, flexShrink: 0,
+                        }}
+                      />
+                    )}
+                    <p style={{
+                      fontFamily: FONT_BODY, fontSize: 12, fontWeight: 400,
+                      color: C.mist, margin: 0,
+                      display: "flex", alignItems: "center", gap: 5,
+                    }}>
+                      <span style={{ color: C.rose, fontWeight: 600, fontSize: 13 }}>+</span>
+                      <span style={{ color: C.slate }}>{addon.name}</span>
+                      {addon.price ? (
+                        <span>— PKR {Number(addon.price).toLocaleString()}</span>
+                      ) : null}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <div style={{ height: 1, background: C.line, marginBottom: 24 }} />
 
             {product.desc && (
