@@ -19,26 +19,27 @@ import {
    DESIGN TOKENS  (mirrors AdminLayout palette)
 ───────────────────────────────────────────────── */
 const C = {
-  cream:        "#FAF6EF",
-  creamDeep:    "#F0E9DC",
-  parchment:    "#E8DDD0",
-  chocolate:    "#5C3317",
-  espresso:     "#2E1A0E",
-  gold:         "#C9A84C",
-  goldLight:    "#E2C97E",
-  caramel:      "#C8956B",
-  mist:         "#7A6558",
-  line:         "rgba(92,51,23,0.12)",
-  lineStrong:   "rgba(92,51,23,0.20)",
-  danger:       "#C94C4C",
-  dangerBg:     "rgba(201,76,76,0.07)",
-  dangerBorder: "rgba(201,76,76,0.25)",
-  successBg:    "rgba(76,153,76,0.08)",
-  successLine:  "rgba(76,153,76,0.35)",
+  cream:        "#FDF8F5",
+  creamDeep:    "#F7EEE9",
+  parchment:    "#EFE0D8",
+  // primary accent — rose/petal replaces chocolate/espresso for interactive elements
+  chocolate:    "#C9818F",   // → rose (primary CTA, active states)
+  espresso:     "#1C1C1C",   // → charcoal (headings, strong text)
+  gold:         "#C9818F",   // → rose (accent rule under heading)
+  goldLight:    "#F2C4CE",   // → blush (CTA text on dark bg)
+  caramel:      "#E8A0B0",   // → petal (focus rings, hover accents)
+  mist:         "#9A8A8A",   // same role
+  line:         "rgba(201,129,143,0.15)",
+  lineStrong:   "rgba(201,129,143,0.25)",
+  danger:       "#B54A4A",
+  dangerBg:     "rgba(181,74,74,0.07)",
+  dangerBorder: "rgba(181,74,74,0.2)",
+  successBg:    "rgba(45,122,79,0.08)",
+  successLine:  "rgba(45,122,79,0.22)",
 };
 
 const FONT_DISPLAY = "'Cormorant Garamond', Georgia, serif";
-const FONT_BODY    = "'DM Sans', system-ui, sans-serif";
+const FONT_BODY    = "'Jost', system-ui, sans-serif";
 
 /* ─────────────────────────────────────────────────
    SEED DATA
@@ -55,6 +56,8 @@ const SEED = [
    GLOBAL STYLES
 ───────────────────────────────────────────────── */
 const STYLES = `
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap');
+
   @keyframes catFadeUp {
     from { opacity: 0; transform: translateY(10px); }
     to   { opacity: 1; transform: translateY(0);    }
@@ -95,14 +98,14 @@ const STYLES = `
   .cat-btn-primary {
     display: inline-flex; align-items: center; gap: 7px;
     padding: 9px 18px;
-    background: ${C.chocolate}; color: ${C.goldLight};
+    background: #1C1C1C; color: ${C.goldLight};
     border: none; border-radius: 6px; cursor: pointer;
     font-family: ${FONT_BODY}; font-size: 13px; font-weight: 600;
     letter-spacing: 0.03em;
     transition: background 0.18s ease, transform 0.12s ease;
     white-space: nowrap;
   }
-  .cat-btn-primary:hover  { background: ${C.espresso}; }
+  .cat-btn-primary:hover  { background: #2d1820; }
   .cat-btn-primary:active { transform: scale(0.97); }
 
   .cat-btn-ghost {
@@ -179,20 +182,20 @@ const STYLES = `
   /* ── Modals ── */
   .cat-modal-overlay {
     position: fixed; inset: 0;
-    background: rgba(46,26,14,0.45); backdrop-filter: blur(2px);
+    background: rgba(28,28,28,0.45); backdrop-filter: blur(2px);
     display: flex; align-items: center; justify-content: center;
     z-index: 500; padding: 20px; box-sizing: border-box;
   }
   .cat-modal {
     background: #fff; border-radius: 10px;
     width: 100%; max-width: 480px;
-    box-shadow: 0 20px 60px rgba(46,26,14,0.22);
+    box-shadow: 0 20px 60px rgba(28,12,18,0.22);
     animation: catSlideIn 0.22s ease both; overflow: hidden;
   }
   .cat-confirm-modal {
     background: #fff; border-radius: 10px;
     width: 100%; max-width: 380px;
-    box-shadow: 0 20px 60px rgba(46,26,14,0.22);
+    box-shadow: 0 20px 60px rgba(28,12,18,0.22);
     animation: catSlideIn 0.22s ease both;
     padding: 28px; text-align: center;
   }
@@ -202,10 +205,10 @@ const STYLES = `
     position: fixed; bottom: 28px; right: 28px; z-index: 600;
     display: flex; align-items: center; gap: 10px;
     padding: 12px 18px;
-    background: ${C.espresso}; color: ${C.goldLight};
+    background: #1C1C1C; color: ${C.goldLight};
     border-radius: 8px;
     font-family: ${FONT_BODY}; font-size: 13px; font-weight: 500;
-    box-shadow: 0 6px 20px rgba(46,26,14,0.28);
+    box-shadow: 0 6px 20px rgba(28,12,18,0.28);
     animation: catToastIn 0.22s ease both;
     max-width: calc(100vw - 48px);
   }
@@ -301,7 +304,7 @@ function ConfirmDialog({ category, onConfirm, onCancel }) {
         }}>
           <AlertTriangle size={20} color={C.danger} />
         </div>
-        <h3 style={{ fontFamily: FONT_DISPLAY, fontSize: 22, fontWeight: 400, color: C.espresso, marginBottom: 8 }}>
+        <h3 style={{ fontFamily: FONT_DISPLAY, fontSize: 22, fontWeight: 400, color: C.espresso, marginBottom: 8, fontStyle: "italic" }}>
           Delete Category?
         </h3>
         <p style={{ fontFamily: FONT_BODY, fontSize: 13, color: C.mist, lineHeight: 1.55, marginBottom: 24 }}>
@@ -387,7 +390,7 @@ function CategoryModal({ mode, initial, existingNames, onSave, onClose }) {
           padding: "20px 24px 18px", borderBottom: `1px solid ${C.line}`,
         }}>
           <div>
-            <h2 style={{ fontFamily: FONT_DISPLAY, fontSize: 24, fontWeight: 400, color: C.espresso, margin: 0 }}>
+            <h2 style={{ fontFamily: FONT_DISPLAY, fontSize: 24, fontWeight: 400, fontStyle: "italic", color: C.espresso, margin: 0, letterSpacing: "0.02em" }}>
               {mode === "add" ? "New Category" : "Edit Category"}
             </h2>
             <p style={{ fontFamily: FONT_BODY, fontSize: 12, color: C.mist, marginTop: 2 }}>
@@ -488,9 +491,9 @@ function EmptyState({ hasSearch, onAdd }) {
         background: C.creamDeep, border: `1.5px solid ${C.parchment}`,
         display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20,
       }}>
-        <Tag size={24} color={C.caramel} strokeWidth={1.5} />
+        <Tag size={24} color="#C9818F" strokeWidth={1.5} />
       </div>
-      <h3 style={{ fontFamily: FONT_DISPLAY, fontSize: 22, fontWeight: 400, color: C.espresso, marginBottom: 6 }}>
+      <h3 style={{ fontFamily: FONT_DISPLAY, fontSize: 22, fontWeight: 400, fontStyle: "italic", color: C.espresso, marginBottom: 6 }}>
         {hasSearch ? "No matching categories" : "No categories yet"}
       </h3>
       <p style={{ fontFamily: FONT_BODY, fontSize: 13, color: C.mist, maxWidth: 280, lineHeight: 1.6, marginBottom: 24 }}>
@@ -666,10 +669,10 @@ export default function Categories() {
       <div style={{ marginBottom: 28 }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 14 }}>
           <div>
-            <h1 style={{ fontFamily: FONT_DISPLAY, fontSize: 36, fontWeight: 400, color: C.espresso, margin: 0, lineHeight: 1.1 }}>
+            <h1 style={{ fontFamily: FONT_DISPLAY, fontSize: 34, fontWeight: 400, fontStyle: "italic", color: C.espresso, margin: 0, lineHeight: 1.1, letterSpacing: "0.02em" }}>
               Categories
             </h1>
-            <div style={{ width: 48, height: 1.5, background: C.gold, margin: "8px 0 10px" }} />
+            <div style={{ width: 40, height: 1, background: "#C9818F", margin: "8px 0 10px", opacity: 0.6 }} />
             <p style={{ fontFamily: FONT_BODY, fontSize: 13, color: C.mist, margin: 0 }}>
               Organise your product catalogue by category.
             </p>
