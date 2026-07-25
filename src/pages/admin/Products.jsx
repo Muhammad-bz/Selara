@@ -43,17 +43,17 @@ import {
    DESIGN TOKENS
 ───────────────────────────────────────────────── */
 const C = {
-  cream:     "#FAF6EF",
-  creamDeep: "#F0E9DC",
-  parchment: "#E8DDD0",
-  chocolate: "#5C3317",
-  espresso:  "#2E1A0E",
-  gold:      "#C9A84C",
-  goldLight: "#E2C97E",
-  caramel:   "#C8956B",
-  mist:      "#7A6558",
-  line:      "rgba(92,51,23,0.12)",
-  lineStrong:"rgba(92,51,23,0.2)",
+  cream:     "#FDF8F5",
+  creamDeep: "#F7EEE9",
+  parchment: "#EFE0D8",
+  chocolate: "#C9818F",
+  espresso:  "#1C1C1C",
+  gold:      "#C9818F",
+  goldLight: "#F2C4CE",
+  caramel:   "#E8A0B0",
+  mist:      "#9A8A8A",
+  line:      "rgba(201,129,143,0.15)",
+  lineStrong:"rgba(201,129,143,0.25)",
   red:       "#DC2626",
   redBg:     "#FEF2F2",
   redLine:   "#FCA5A5",
@@ -62,7 +62,7 @@ const C = {
   greenLine: "#86EFAC",
 };
 const FONT_DISPLAY = "'Cormorant Garamond', Georgia, serif";
-const FONT_BODY    = "'DM Sans', system-ui, sans-serif";
+const FONT_BODY    = "'Jost', system-ui, sans-serif";
 
 /* ─────────────────────────────────────────────────
    CLOUDINARY CONFIG  ← replace these before going live
@@ -227,7 +227,7 @@ function ProductsStyles() {
       /* Overlay */
       .crm-overlay {
         position: fixed; inset: 0;
-        background: rgba(20,8,2,0.52);
+        background: rgba(28,28,28,0.52);
         backdrop-filter: blur(3px);
         z-index: 400;
         animation: crmFadeIn 0.2s ease;
@@ -242,7 +242,7 @@ function ProductsStyles() {
         width: 100%; max-width: 560px;
         max-height: 90vh;
         display: flex; flex-direction: column;
-        box-shadow: 0 24px 80px rgba(20,8,2,0.35);
+        box-shadow: 0 24px 80px rgba(28,12,18,0.30);
         animation: crmScaleIn 0.25s cubic-bezier(0.16,1,0.3,1);
         overflow: hidden;
       }
@@ -286,14 +286,14 @@ function ProductsStyles() {
         box-sizing: border-box;
       }
       .crm-input:focus {
-        border-color: ${C.gold};
-        box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+        border-color: #C9818F;
+        box-shadow: 0 0 0 3px rgba(201,129,143,0.12);
       }
       .crm-input.error { border-color: ${C.red}; }
       .crm-textarea { resize: vertical; min-height: 80px; }
       .crm-select {
         appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237A6558' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239A8A8A' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 12px center;
         padding-right: 36px;
@@ -326,7 +326,7 @@ function ProductsStyles() {
         transition: background 0.2s;
         flex-shrink: 0;
       }
-      .crm-toggle.on { background: ${C.gold}; }
+      .crm-toggle.on { background: #C9818F; }
       .crm-toggle::after {
         content: '';
         position: absolute;
@@ -352,9 +352,9 @@ function ProductsStyles() {
       .crm-btn:active { transform: scale(0.97); }
       .crm-btn:disabled { opacity: 0.55; cursor: not-allowed; }
       .crm-btn-primary {
-        background: ${C.espresso}; color: ${C.cream};
+        background: #1C1C1C; color: ${C.cream};
       }
-      .crm-btn-primary:hover:not(:disabled) { background: #1a0b04; }
+      .crm-btn-primary:hover:not(:disabled) { background: #2d1820; }
       .crm-btn-ghost {
         background: transparent; color: ${C.mist};
         border: 1px solid ${C.lineStrong};
@@ -365,9 +365,9 @@ function ProductsStyles() {
       }
       .crm-btn-danger:hover:not(:disabled) { background: #b91c1c; }
       .crm-btn-gold {
-        background: ${C.gold}; color: ${C.espresso};
+        background: #1C1C1C; color: ${C.goldLight};
       }
-      .crm-btn-gold:hover:not(:disabled) { background: ${C.goldLight}; }
+      .crm-btn-gold:hover:not(:disabled) { background: #2d1820; }
 
       /* Icon button */
       .crm-icon-btn {
@@ -379,7 +379,7 @@ function ProductsStyles() {
         flex-shrink: 0;
       }
       .crm-icon-btn.edit { color: ${C.mist}; }
-      .crm-icon-btn.edit:hover { background: rgba(201,168,76,0.12); color: ${C.chocolate}; }
+      .crm-icon-btn.edit:hover { background: rgba(201,129,143,0.12); color: ${C.chocolate}; }
       .crm-icon-btn.del  { color: ${C.mist}; }
       .crm-icon-btn.del:hover  { background: ${C.redBg}; color: ${C.red}; }
 
@@ -405,8 +405,8 @@ function ProductsStyles() {
         transition: border-color 0.18s, box-shadow 0.18s;
       }
       .crm-search:focus {
-        border-color: ${C.gold};
-        box-shadow: 0 0 0 3px rgba(201,168,76,0.10);
+        border-color: #C9818F;
+        box-shadow: 0 0 0 3px rgba(201,129,143,0.10);
       }
       .crm-search-clear {
         position: absolute; right: 8px; top: 50%;
@@ -423,12 +423,12 @@ function ProductsStyles() {
         border: 1px solid ${C.lineStrong}; border-radius: 6px;
         outline: none; cursor: pointer;
         appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%237A6558' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%239A8A8A' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 11px center;
         transition: border-color 0.18s;
       }
-      .crm-filter-select:focus { border-color: ${C.gold}; outline: none; }
+      .crm-filter-select:focus { border-color: #C9818F; outline: none; }
 
       /* Badge */
       .crm-badge {
@@ -440,7 +440,7 @@ function ProductsStyles() {
       }
       .crm-badge.yes { background: ${C.greenBg}; color: ${C.green}; }
       .crm-badge.no  { background: ${C.parchment}; color: ${C.mist}; }
-      .crm-badge.featured { background: rgba(201,168,76,0.15); color: #92700a; }
+      .crm-badge.featured { background: rgba(201,129,143,0.15); color: #92700a; }
 
       /* Table */
       .crm-table-wrap {
@@ -448,7 +448,7 @@ function ProductsStyles() {
         border: 1px solid ${C.line};
         border-radius: 10px;
         overflow: hidden;
-        box-shadow: 0 2px 12px rgba(46,26,14,0.05);
+        box-shadow: 0 2px 12px rgba(201,129,143,0.06);
       }
       .crm-table {
         width: 100%; border-collapse: collapse;
@@ -510,11 +510,11 @@ function ProductsStyles() {
         border-radius: 10px;
         padding: 14px;
         display: flex; gap: 12px; align-items: flex-start;
-        box-shadow: 0 1px 6px rgba(46,26,14,0.05);
+        box-shadow: 0 1px 6px rgba(201,129,143,0.06);
         animation: crmFadeUp 0.3s ease both;
         transition: box-shadow 0.18s;
       }
-      .crm-card:hover { box-shadow: 0 4px 16px rgba(46,26,14,0.09); }
+      .crm-card:hover { box-shadow: 0 4px 16px rgba(201,129,143,0.10); }
       .crm-card-thumb {
         width: 56px; height: 56px;
         border-radius: 8px; object-fit: cover;
@@ -594,7 +594,7 @@ function ProductsStyles() {
         width: 100%; justify-content: center; box-sizing: border-box;
       }
       .crm-upload-btn:hover:not(:disabled) {
-        background: ${C.parchment}; border-color: ${C.gold};
+        background: ${C.parchment}; border-color: #C9818F;
       }
       .crm-upload-btn:disabled { opacity: 0.55; cursor: not-allowed; }
       .crm-upload-progress-wrap {
@@ -603,7 +603,7 @@ function ProductsStyles() {
         margin-top: 8px; overflow: hidden;
       }
       .crm-upload-progress-bar {
-        height: 100%; background: ${C.gold};
+        height: 100%; background: #C9818F;
         border-radius: 2px;
         transition: width 0.2s ease;
       }
@@ -632,7 +632,7 @@ function ProductsStyles() {
         aspect-ratio: 1;
       }
       .crm-img-thumb-wrap.main-img {
-        border-color: ${C.gold};
+        border-color: #C9818F;
       }
       .crm-img-thumb-wrap img {
         width: 100%; height: 100%;
@@ -640,7 +640,7 @@ function ProductsStyles() {
       }
       .crm-img-thumb-remove {
         position: absolute; top: 3px; right: 3px;
-        background: rgba(20,8,2,0.72); border: none;
+        background: rgba(28,28,28,0.72); border: none;
         border-radius: 50%; width: 20px; height: 20px;
         cursor: pointer; color: #fff;
         display: flex; align-items: center; justify-content: center;
@@ -658,7 +658,7 @@ function ProductsStyles() {
       }
       .crm-img-set-main {
         position: absolute; bottom: 3px; right: 3px;
-        background: rgba(20,8,2,0.65); border: none;
+        background: rgba(28,28,28,0.65); border: none;
         border-radius: 3px; padding: 2px 5px;
         font-family: ${FONT_BODY}; font-size: 8px; color: #fff;
         font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
@@ -672,7 +672,7 @@ function ProductsStyles() {
         border-radius: 10px;
         width: 100%; max-width: 400px;
         padding: 28px 24px 22px;
-        box-shadow: 0 24px 80px rgba(20,8,2,0.35);
+        box-shadow: 0 24px 80px rgba(28,12,18,0.30);
         animation: crmScaleIn 0.22s cubic-bezier(0.16,1,0.3,1);
       }
 
@@ -681,7 +681,7 @@ function ProductsStyles() {
         display: inline-flex; align-items: center;
         padding: 2px 9px; border-radius: 20px;
         font-family: ${FONT_BODY}; font-size: 11px; font-weight: 600;
-        background: ${C.espresso}; color: ${C.goldLight};
+        background: #1C1C1C; color: ${C.goldLight};
         letter-spacing: 0.04em; flex-shrink: 0;
       }
 
@@ -944,7 +944,7 @@ function ProductModal({ mode, initial, onSave, onClose }) {
         {/* Header */}
         <div className="crm-modal-header">
           <div>
-            <h2 style={{ fontFamily: FONT_DISPLAY, fontSize: 22, fontWeight: 400, color: C.espresso, margin: 0 }}>
+            <h2 style={{ fontFamily: FONT_DISPLAY, fontSize: 22, fontWeight: 400, fontStyle: "italic", color: C.espresso, margin: 0, letterSpacing: "0.02em" }}>
               {isEdit ? "Edit Product" : "Add Product"}
             </h2>
             <p style={{ fontFamily: FONT_BODY, fontSize: 12, color: C.mist, marginTop: 2 }}>
@@ -1182,7 +1182,7 @@ function DeleteDialog({ product, onConfirm, onClose }) {
             <AlertTriangle size={18} color={C.red} />
           </div>
           <div>
-            <h3 style={{ fontFamily: FONT_DISPLAY, fontSize: 20, fontWeight: 400, color: C.espresso, margin: "0 0 6px" }}>
+            <h3 style={{ fontFamily: FONT_DISPLAY, fontSize: 20, fontWeight: 400, fontStyle: "italic", color: C.espresso, margin: "0 0 6px", letterSpacing: "0.02em" }}>
               Delete product?
             </h3>
             <p style={{ fontFamily: FONT_BODY, fontSize: 13, color: C.mist, lineHeight: 1.6 }}>
@@ -1297,7 +1297,7 @@ function EmptyState({ hasFilters, onAdd, onClear }) {
       </div>
       {hasFilters ? (
         <>
-          <p style={{ fontFamily: FONT_DISPLAY, fontSize: 22, fontWeight: 300, color: C.espresso, marginBottom: 6 }}>
+          <p style={{ fontFamily: FONT_DISPLAY, fontSize: 22, fontWeight: 300, fontStyle: "italic", color: C.espresso, marginBottom: 6 }}>
             No products found
           </p>
           <p style={{ fontFamily: FONT_BODY, fontSize: 13, color: C.mist, marginBottom: 18 }}>
@@ -1309,7 +1309,7 @@ function EmptyState({ hasFilters, onAdd, onClear }) {
         </>
       ) : (
         <>
-          <p style={{ fontFamily: FONT_DISPLAY, fontSize: 22, fontWeight: 300, color: C.espresso, marginBottom: 6 }}>
+          <p style={{ fontFamily: FONT_DISPLAY, fontSize: 22, fontWeight: 300, fontStyle: "italic", color: C.espresso, marginBottom: 6 }}>
             No products yet
           </p>
           <p style={{ fontFamily: FONT_BODY, fontSize: 13, color: C.mist, marginBottom: 18 }}>
@@ -1511,12 +1511,12 @@ export default function Products() {
         {/* Page heading */}
         <div style={{ marginBottom: 24 }}>
           <h1 style={{
-            fontFamily: FONT_DISPLAY, fontSize: 32, fontWeight: 400,
-            color: C.espresso, margin: 0, lineHeight: 1.1,
+            fontFamily: FONT_DISPLAY, fontSize: 34, fontWeight: 400,
+            fontStyle: "italic", color: C.espresso, margin: 0, lineHeight: 1.1, letterSpacing: "0.02em",
           }}>
             Products
           </h1>
-          <div style={{ width: 48, height: 1.5, background: C.gold, marginTop: 10 }} />
+          <div style={{ width: 40, height: 1, background: "#C9818F", marginTop: 6, opacity: 0.6 }} />
         </div>
 
         {/* Firestore error banner */}

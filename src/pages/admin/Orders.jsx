@@ -34,19 +34,19 @@ import {
    DESIGN TOKENS  (mirrors AdminLayout exactly)
 ───────────────────────────────────────────────── */
 const C = {
-  cream:     "#FAF6EF",
-  creamDeep: "#F0E9DC",
-  parchment: "#E8DDD0",
-  chocolate: "#5C3317",
-  espresso:  "#2E1A0E",
-  gold:      "#C9A84C",
-  goldLight: "#E2C97E",
-  caramel:   "#C8956B",
-  mist:      "#7A6558",
-  line:      "rgba(92,51,23,0.12)",
+  cream:     "#FDF8F5",
+  creamDeep: "#F7EEE9",
+  parchment: "#EFE0D8",
+  chocolate: "#C9818F",
+  espresso:  "#1C1C1C",
+  gold:      "#C9818F",
+  goldLight: "#F2C4CE",
+  caramel:   "#E8A0B0",
+  mist:      "#9A8A8A",
+  line:      "rgba(201,129,143,0.15)",
 };
 const FONT_DISPLAY = "'Cormorant Garamond', Georgia, serif";
-const FONT_BODY    = "'DM Sans', system-ui, sans-serif";
+const FONT_BODY    = "'Jost', system-ui, sans-serif";
 
 /* ─────────────────────────────────────────────────
    STATUS CONFIG
@@ -55,9 +55,9 @@ const STATUS = {
   pending: {
     label: "Pending",
     color: "#92670A",
-    bg:    "rgba(201,168,76,0.13)",
-    border:"rgba(201,168,76,0.35)",
-    dot:   C.gold,
+    bg:    "rgba(201,129,143,0.13)",
+    border:"rgba(201,129,143,0.35)",
+    dot:   "#C9818F",
   },
   confirmed: {
     label: "Confirmed",
@@ -194,11 +194,11 @@ function OrdersStyles() {
         flex: 1 1 160px;
         min-width: 0;
         animation: ord-rise 0.38s ease both;
-        box-shadow: 0 1px 3px rgba(46,26,14,0.05);
+        box-shadow: 0 1px 3px rgba(201,129,143,0.06);
         transition: box-shadow 0.2s ease, transform 0.2s ease;
       }
       .ord-stat-card:hover {
-        box-shadow: 0 4px 16px rgba(46,26,14,0.09);
+        box-shadow: 0 4px 16px rgba(201,129,143,0.10);
         transform: translateY(-1px);
       }
 
@@ -232,8 +232,8 @@ function OrdersStyles() {
       }
       .ord-search-input::placeholder { color: ${C.mist}; opacity: 0.65; }
       .ord-search-input:focus {
-        border-color: ${C.gold};
-        box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+        border-color: #C9818F;
+        box-shadow: 0 0 0 3px rgba(201,129,143,0.12);
       }
       .ord-search-icon {
         position: absolute;
@@ -287,8 +287,8 @@ function OrdersStyles() {
         min-width: 140px;
       }
       .ord-filter-select:focus {
-        border-color: ${C.gold};
-        box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+        border-color: #C9818F;
+        box-shadow: 0 0 0 3px rgba(201,129,143,0.12);
       }
       .ord-filter-chevron {
         position: absolute;
@@ -308,7 +308,7 @@ function OrdersStyles() {
         border: 1px solid ${C.line};
         border-radius: 10px;
         overflow: hidden;
-        box-shadow: 0 1px 3px rgba(46,26,14,0.05);
+        box-shadow: 0 1px 3px rgba(201,129,143,0.06);
         animation: ord-rise 0.42s ease both;
         animation-delay: 0.08s;
       }
@@ -338,7 +338,7 @@ function OrdersStyles() {
         padding: 12px 14px;
         vertical-align: middle;
         color: ${C.espresso};
-        border-bottom: 1px solid rgba(92,51,23,0.06);
+        border-bottom: 1px solid rgba(201,129,143,0.07);
       }
       .ord-table tbody tr {
         animation: ord-row-in 0.3s ease both;
@@ -352,7 +352,7 @@ function OrdersStyles() {
       .ord-mobile-cards { display: none; }
       .ord-mobile-card {
         padding: 16px;
-        border-bottom: 1px solid rgba(92,51,23,0.07);
+        border-bottom: 1px solid rgba(201,129,143,0.08);
         animation: ord-row-in 0.3s ease both;
         transition: background 0.15s;
         cursor: pointer;
@@ -370,23 +370,23 @@ function OrdersStyles() {
         font-size: 11.5px;
         font-weight: 500;
         color: ${C.chocolate};
-        background: rgba(201,168,76,0.10);
-        border: 1px solid rgba(201,168,76,0.28);
+        background: rgba(201,129,143,0.10);
+        border: 1px solid rgba(201,129,143,0.28);
         border-radius: 5px;
         cursor: pointer;
         transition: background 0.15s, border-color 0.15s;
         white-space: nowrap;
       }
       .ord-view-btn:hover {
-        background: rgba(201,168,76,0.20);
-        border-color: ${C.gold};
+        background: rgba(201,129,143,0.20);
+        border-color: #C9818F;
       }
 
       /* ── Modal overlay ────────────────────────── */
       .ord-modal-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(20,8,2,0.45);
+        background: rgba(28,28,28,0.45);
         z-index: 500;
         display: flex;
         align-items: center;
@@ -402,7 +402,7 @@ function OrdersStyles() {
         max-width: 600px;
         max-height: 90vh;
         overflow-y: auto;
-        box-shadow: 0 24px 64px rgba(20,8,2,0.25);
+        box-shadow: 0 24px 64px rgba(28,12,18,0.22);
         animation: ord-modal-in 0.28s cubic-bezier(0.34,1.4,0.64,1);
         position: relative;
       }
@@ -442,7 +442,7 @@ function OrdersStyles() {
         display: flex;
         gap: 10px;
         padding: 11px 0;
-        border-bottom: 1px solid rgba(92,51,23,0.07);
+        border-bottom: 1px solid rgba(201,129,143,0.08);
         align-items: flex-start;
       }
       .ord-detail-row:last-child { border-bottom: none; }
@@ -450,7 +450,7 @@ function OrdersStyles() {
         width: 30px;
         height: 30px;
         border-radius: 7px;
-        background: rgba(201,168,76,0.10);
+        background: rgba(201,129,143,0.10);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -494,7 +494,7 @@ function OrdersStyles() {
       .ord-items-table th:last-child { text-align: right; }
       .ord-items-table td {
         padding: 9px 0;
-        border-bottom: 1px solid rgba(92,51,23,0.06);
+        border-bottom: 1px solid rgba(201,129,143,0.07);
         color: ${C.espresso};
         vertical-align: middle;
       }
@@ -518,13 +518,13 @@ function OrdersStyles() {
         cursor: pointer;
         outline: none;
         transition: box-shadow 0.18s;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237A6558' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239A8A8A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
         background-position: right 10px center;
         width: 100%;
       }
       .ord-status-select:focus {
-        box-shadow: 0 0 0 3px rgba(201,168,76,0.16);
+        box-shadow: 0 0 0 3px rgba(201,129,143,0.16);
       }
       .ord-status-saving {
         font-family: ${FONT_BODY};
@@ -708,6 +708,7 @@ function EmptyState({ hasFilters }) {
         fontFamily: FONT_DISPLAY,
         fontSize: 22,
         fontWeight: 400,
+        fontStyle: "italic",
         color: C.espresso,
         marginBottom: 8,
       }}>
@@ -812,8 +813,9 @@ function OrderModal({ order, onClose }) {
             fontFamily: FONT_DISPLAY,
             fontSize: 26,
             fontWeight: 400,
+            fontStyle: "italic",
             color: C.espresso,
-            letterSpacing: "0.01em",
+            letterSpacing: "0.02em",
             lineHeight: 1.1,
           }}>
             {order.customer}
@@ -834,7 +836,7 @@ function OrderModal({ order, onClose }) {
             {order.phone && (
               <div className="ord-detail-row">
                 <div className="ord-detail-icon">
-                  <Phone size={13} color={C.gold} />
+                  <Phone size={13} color="#C9818F" />
                 </div>
                 <div>
                   <p className="ord-detail-label">Phone</p>
@@ -846,7 +848,7 @@ function OrderModal({ order, onClose }) {
             {order.address && (
               <div className="ord-detail-row">
                 <div className="ord-detail-icon">
-                  <MapPin size={13} color={C.gold} />
+                  <MapPin size={13} color="#C9818F" />
                 </div>
                 <div>
                   <p className="ord-detail-label">Delivery Address</p>
@@ -858,7 +860,7 @@ function OrderModal({ order, onClose }) {
             {order.notes && (
               <div className="ord-detail-row">
                 <div className="ord-detail-icon">
-                  <FileText size={13} color={C.gold} />
+                  <FileText size={13} color="#C9818F" />
                 </div>
                 <div>
                   <p className="ord-detail-label">Order Notes</p>
@@ -871,7 +873,7 @@ function OrderModal({ order, onClose }) {
 
             <div className="ord-detail-row">
               <div className="ord-detail-icon">
-                <Calendar size={13} color={C.gold} />
+                <Calendar size={13} color="#C9818F" />
               </div>
               <div>
                 <p className="ord-detail-label">Date &amp; Time</p>
@@ -934,7 +936,7 @@ function OrderModal({ order, onClose }) {
                   ? order.items.map((name, i) => (
                       <div key={i} style={{
                         padding: "8px 0",
-                        borderBottom: i < order.items.length - 1 ? `1px solid rgba(92,51,23,0.06)` : "none",
+                        borderBottom: i < order.items.length - 1 ? `1px solid rgba(201,129,143,0.07)` : "none",
                         color: C.espresso,
                       }}>
                         {name}
@@ -1072,15 +1074,16 @@ export default function Orders() {
         <div style={{ marginBottom: 28 }}>
           <h1 style={{
             fontFamily: FONT_DISPLAY,
-            fontSize: 36,
+            fontSize: 34,
             fontWeight: 400,
+            fontStyle: "italic",
             color: C.espresso,
-            marginBottom: 8,
-            letterSpacing: "0.01em",
+            marginBottom: 6,
+            letterSpacing: "0.02em",
           }}>
             Orders
           </h1>
-          <div style={{ width: 56, height: 1.5, background: C.gold, marginBottom: 10 }} />
+          <div style={{ width: 40, height: 1, background: "#C9818F", marginBottom: 26, opacity: 0.6 }} />
           <p style={{ fontFamily: FONT_BODY, fontSize: 13, color: C.mist, lineHeight: 1.5 }}>
             View and manage customer orders. Click any order to see details and update its status.
           </p>
@@ -1093,8 +1096,8 @@ export default function Orders() {
         >
           <StatCard
             icon={ShoppingCart}
-            iconColor={C.gold}
-            iconBg="rgba(201,168,76,0.12)"
+            iconColor="#C9818F"
+            iconBg="rgba(201,129,143,0.12)"
             label="Today's Orders"
             value={stats.todayCount}
             delay={0}
@@ -1102,7 +1105,7 @@ export default function Orders() {
           <StatCard
             icon={Clock}
             iconColor="#A0620D"
-            iconBg="rgba(201,168,76,0.10)"
+            iconBg="rgba(201,129,143,0.10)"
             label="Pending"
             value={stats.pending}
             delay={0.05}
@@ -1117,8 +1120,8 @@ export default function Orders() {
           />
           <StatCard
             icon={Banknote}
-            iconColor={C.chocolate}
-            iconBg={`rgba(92,51,23,0.08)`}
+            iconColor="#C9818F"
+            iconBg="rgba(201,129,143,0.08)"
             label="Revenue Today"
             value={`Rs. ${stats.revenue.toLocaleString()}`}
             delay={0.15}

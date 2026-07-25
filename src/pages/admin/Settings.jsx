@@ -29,19 +29,19 @@ import { db } from "../../firebase/config";
    DESIGN TOKENS  (mirrors AdminLayout exactly)
 ───────────────────────────────────────────────── */
 const C = {
-  cream:     "#FAF6EF",
-  creamDeep: "#F0E9DC",
-  parchment: "#E8DDD0",
-  chocolate: "#5C3317",
-  espresso:  "#2E1A0E",
-  gold:      "#C9A84C",
-  goldLight: "#E2C97E",
-  caramel:   "#C8956B",
-  mist:      "#7A6558",
-  line:      "rgba(92,51,23,0.12)",
+  cream:     "#FDF8F5",
+  creamDeep: "#F7EEE9",
+  parchment: "#EFE0D8",
+  chocolate: "#C9818F",
+  espresso:  "#1C1C1C",
+  gold:      "#C9818F",
+  goldLight: "#F2C4CE",
+  caramel:   "#E8A0B0",
+  mist:      "#9A8A8A",
+  line:      "rgba(201,129,143,0.15)",
 };
 const FONT_DISPLAY = "'Cormorant Garamond', Georgia, serif";
-const FONT_BODY    = "'DM Sans', system-ui, sans-serif";
+const FONT_BODY    = "'Jost', system-ui, sans-serif";
 
 /* ─────────────────────────────────────────────────
    CONSTANTS
@@ -137,13 +137,13 @@ function SettingsStyles() {
         border: 1px solid ${C.line};
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 1px 4px rgba(46,26,14,0.05);
+        box-shadow: 0 1px 4px rgba(201,129,143,0.06);
         animation: set-rise 0.38s ease both;
         transition: border-color 0.22s ease, box-shadow 0.22s ease;
       }
       .set-card:focus-within {
         border-color: rgba(201,168,76,0.32);
-        box-shadow: 0 4px 22px rgba(46,26,14,0.09);
+        box-shadow: 0 4px 22px rgba(201,129,143,0.10);
       }
       .set-card-header {
         padding: 18px 24px;
@@ -156,8 +156,8 @@ function SettingsStyles() {
       .set-card-icon {
         width: 36px; height: 36px;
         border-radius: 9px;
-        background: rgba(201,168,76,0.11);
-        border: 1px solid rgba(201,168,76,0.22);
+        background: rgba(201,129,143,0.11);
+        border: 1px solid rgba(201,129,143,0.22);
         display: flex; align-items: center; justify-content: center;
         flex-shrink: 0;
       }
@@ -194,8 +194,8 @@ function SettingsStyles() {
         transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
       }
       .set-input::placeholder { color: ${C.mist}; opacity: 0.45; }
-      .set-input:hover  { border-color: rgba(201,168,76,0.38); background: #fff; }
-      .set-input:focus  { border-color: ${C.gold}; box-shadow: 0 0 0 3px rgba(201,168,76,0.13); background: #fff; }
+      .set-input:hover  { border-color: rgba(201,129,143,0.38); background: #fff; }
+      .set-input:focus  { border-color: #C9818F; box-shadow: 0 0 0 3px rgba(201,129,143,0.13); background: #fff; }
       .set-textarea { height: auto; padding: 11px 13px; resize: vertical; min-height: 72px; line-height: 1.55; }
       input[type="time"].set-input { cursor: pointer; }
 
@@ -209,13 +209,13 @@ function SettingsStyles() {
         transition: border-color 0.16s, background 0.16s, color 0.16s, transform 0.1s;
         -webkit-tap-highlight-color: transparent; user-select: none;
       }
-      .set-day-pill:hover { border-color: rgba(201,168,76,0.45); color: ${C.chocolate}; }
+      .set-day-pill:hover { border-color: rgba(201,129,143,0.45); color: ${C.chocolate}; }
       .set-day-pill.active {
-        background: rgba(201,168,76,0.14); border-color: ${C.gold};
+        background: rgba(201,129,143,0.14); border-color: #C9818F;
         color: ${C.chocolate}; font-weight: 600;
       }
       .set-day-pill:active { transform: scale(0.95); }
-      .set-day-dot { width: 6px; height: 6px; border-radius: 50%; background: ${C.gold}; flex-shrink: 0; }
+      .set-day-dot { width: 6px; height: 6px; border-radius: 50%; background: #C9818F; flex-shrink: 0; }
 
       /* Image upload widget */
       .set-img-upload {
@@ -227,7 +227,7 @@ function SettingsStyles() {
         transition: border-color 0.18s, background 0.18s;
         min-height: 72px;
       }
-      .set-img-upload:hover { border-color: rgba(201,168,76,0.45); background: #fff; }
+      .set-img-upload:hover { border-color: rgba(201,129,143,0.45); background: #fff; }
       .set-img-upload-thumb {
         width: 52px; height: 52px; border-radius: 7px;
         object-fit: cover; flex-shrink: 0;
@@ -236,14 +236,14 @@ function SettingsStyles() {
       }
       .set-img-upload-btn {
         font-family: ${FONT_BODY}; font-size: 12px; font-weight: 600;
-        color: ${C.chocolate}; background: rgba(201,168,76,0.13);
-        border: 1px solid rgba(201,168,76,0.28);
+        color: ${C.chocolate}; background: rgba(201,129,143,0.13);
+        border: 1px solid rgba(201,129,143,0.28);
         border-radius: 6px; padding: 7px 14px;
         cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
         transition: background 0.16s, border-color 0.16s;
         white-space: nowrap;
       }
-      .set-img-upload-btn:hover { background: rgba(201,168,76,0.22); border-color: ${C.gold}; }
+      .set-img-upload-btn:hover { background: rgba(201,129,143,0.22); border-color: #C9818F; }
       .set-img-upload-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
       /* Sticky save bar */
@@ -252,8 +252,8 @@ function SettingsStyles() {
         display: flex; align-items: center; gap: 10px;
         padding: 12px 28px calc(12px + env(safe-area-inset-bottom, 0px));
         background: ${C.espresso};
-        border-top: 1px solid rgba(201,168,76,0.18);
-        box-shadow: 0 -6px 28px rgba(20,8,2,0.22);
+        border-top: 1px solid rgba(201,129,143,0.18);
+        box-shadow: 0 -6px 28px rgba(28,12,18,0.22);
         transform: translateY(100%);
         transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
         will-change: transform;
@@ -269,12 +269,12 @@ function SettingsStyles() {
         padding: 0 22px; height: 42px;
         font-family: ${FONT_BODY}; font-size: 13px; font-weight: 700;
         letter-spacing: 0.01em; color: ${C.espresso};
-        background: ${C.gold}; border: none; border-radius: 7px;
+        background: #1C1C1C; border: none; border-radius: 7px;
         cursor: pointer; white-space: nowrap; flex-shrink: 0;
         -webkit-tap-highlight-color: transparent;
         transition: background 0.18s, transform 0.12s;
       }
-      .set-save-btn:hover  { background: ${C.goldLight}; }
+      .set-save-btn:hover  { background: #2d1820; }
       .set-save-btn:active { transform: scale(0.97); }
       .set-reset-btn {
         display: inline-flex; align-items: center; justify-content: center; gap: 6px;
@@ -297,8 +297,8 @@ function SettingsStyles() {
         display: flex; align-items: center; gap: 10px;
         padding: 12px 14px; background: #fff;
         border: 1px solid rgba(34,139,70,0.22);
-        border-left: 3px solid #22A84A; border-radius: 9px;
-        box-shadow: 0 4px 22px rgba(46,26,14,0.12);
+        border-left: 3px solid #2D7A4F; border-radius: 9px;
+        box-shadow: 0 4px 22px rgba(201,129,143,0.08);
         font-family: ${FONT_BODY}; font-size: 13px; font-weight: 500;
         color: ${C.espresso}; max-width: 280px;
         transform: translateX(calc(100% + 32px));
@@ -369,10 +369,10 @@ function SectionCard({ icon: Icon, title, subtitle, children, delay = 0 }) {
     <div className="set-card" style={{ animationDelay: `${delay}s` }}>
       <div className="set-card-header">
         <div className="set-card-icon">
-          <Icon size={15} color={C.gold} />
+          <Icon size={15} color="#C9818F" />
         </div>
         <div>
-          <p style={{ fontFamily: FONT_DISPLAY, fontSize: 20, fontWeight: 400, color: C.espresso, lineHeight: 1.1, letterSpacing: "0.01em" }}>
+          <p style={{ fontFamily: FONT_DISPLAY, fontSize: 20, fontWeight: 400, fontStyle: "italic", color: C.espresso, lineHeight: 1.1, letterSpacing: "0.02em" }}>
             {title}
           </p>
           {subtitle && (
@@ -657,7 +657,7 @@ export default function Settings() {
       <>
         <SettingsStyles />
         <div className="set-loading-overlay">
-          <Loader size={18} color={C.gold} className="set-spinner" />
+          <Loader size={18} color="#C9818F" className="set-spinner" />
           <span>Loading settings…</span>
         </div>
       </>
@@ -684,10 +684,10 @@ export default function Settings() {
       >
         {/* ── Page header ── */}
         <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontFamily: FONT_DISPLAY, fontSize: 36, fontWeight: 400, color: C.espresso, marginBottom: 8, letterSpacing: "0.01em" }}>
+          <h1 style={{ fontFamily: FONT_DISPLAY, fontSize: 34, fontWeight: 400, fontStyle: "italic", color: C.espresso, marginBottom: 6, letterSpacing: "0.02em" }}>
             Settings
           </h1>
-          <div style={{ width: 56, height: 1.5, background: C.gold, marginBottom: 10 }} />
+          <div style={{ width: 40, height: 1, background: "#C9818F", marginBottom: 26, opacity: 0.6 }} />
           <p style={{ fontFamily: FONT_BODY, fontSize: 13, color: C.mist, lineHeight: 1.6 }}>
             Manage your store's business information. Changes are saved to Firestore and reflected on the live site.
           </p>
