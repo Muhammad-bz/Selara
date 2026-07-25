@@ -44,13 +44,41 @@ const FONT_BODY    = "'Jost', system-ui, sans-serif";
 /* ─────────────────────────────────────────────────
    SEED DATA
 ───────────────────────────────────────────────── */
-let _nextId = 5;
+const LS_KEY  = "cremeo_categories";
+const LS_ID   = "cremeo_categories_nextId";
+
 const SEED = [
   { id: 1, name: "Category A", description: "First product category.", displayOrder: 1, active: true,  createdDate: "2024-03-01" },
   { id: 2, name: "Category B", description: "Second product category.", displayOrder: 2, active: true,  createdDate: "2024-03-05" },
   { id: 3, name: "Category C", description: "Third product category.",  displayOrder: 3, active: true,  createdDate: "2024-04-12" },
   { id: 4, name: "Category D", description: "Fourth product category.", displayOrder: 4, active: false, createdDate: "2024-06-20" },
 ];
+
+function loadCategories() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (_) {}
+  return SEED;
+}
+
+function saveCategories(cats) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(cats)); } catch (_) {}
+}
+
+function loadNextId() {
+  try {
+    const v = localStorage.getItem(LS_ID);
+    if (v) return Number(v);
+  } catch (_) {}
+  return 5;
+}
+
+function saveNextId(id) {
+  try { localStorage.setItem(LS_ID, String(id)); } catch (_) {}
+}
+
+let _nextId = loadNextId();
 
 /* ─────────────────────────────────────────────────
    GLOBAL STYLES
@@ -597,7 +625,7 @@ function MobileCard({ cat, idx, onEdit, onDelete, onToggle }) {
    MAIN COMPONENT
 ───────────────────────────────────────────────── */
 export default function Categories() {
-  const [categories, setCategories] = useState(SEED);
+  const [categories, setCategories] = useState(() => loadCategories());
   const [search,     setSearch]     = useState("");
   const [sort,       setSort]       = useState({ field: "displayOrder", dir: "asc" });
   const [modal,      setModal]      = useState(null);
@@ -636,21 +664,40 @@ export default function Categories() {
 
   const handleSave = (form) => {
     if (modal.mode === "add") {
-      setCategories((prev) => [...prev, { ...form, id: _nextId++, createdDate: today() }]);
+      const newId = _nextId++;
+      saveNextId(_nextId);
+      setCategories((prev) => {
+        const next = [...prev, { ...form, id: newId, createdDate: today() }];
+        saveCategories(next);
+        return next;
+      });
       showToast(`"${form.name}" added.`);
     } else {
-      setCategories((prev) => prev.map((c) => c.id === modal.category.id ? { ...c, ...form } : c));
+      setCategories((prev) => {
+        const next = prev.map((c) => c.id === modal.category.id ? { ...c, ...form } : c);
+        saveCategories(next);
+        return next;
+      });
       showToast(`"${form.name}" updated.`);
     }
     setModal(null);
   };
 
   const handleToggleActive = (id, val) =>
-    setCategories((prev) => prev.map((c) => c.id === id ? { ...c, active: val } : c));
+    setCategories((prev) => {
+      const next = prev.map((c) => c.id === id ? { ...c, active: val } : c);
+      saveCategories(next);
+      return next;
+    });
 
   const handleDelete = () => {
     const name = confirmDel.name;
-    setCategories((prev) => prev.filter((c) => c.id !== confirmDel.id));
+    const delId = confirmDel.id;
+    setCategories((prev) => {
+      const next = prev.filter((c) => c.id !== delId);
+      saveCategories(next);
+      return next;
+    });
     setConfirmDel(null);
     showToast(`"${name}" deleted.`);
   };
