@@ -89,7 +89,7 @@ const AboutSection = memo(function AboutSection({ settings = {} }) {
               </>
             )}
             <div className="stats-row">
-              {[["100+", "Pieces"], ["Pret", "Collection"], ["Lahore", "Pakistan"]].map(([n, l]) => (
+              {[["Pret", "Collection"], ["Lahore", "Pakistan"]].map(([n, l]) => (
                 <div key={l}>
                   <p style={{ fontFamily: FONT_DISPLAY, fontSize: 32, fontWeight: 300, color: C.blush, lineHeight: 1 }}>
                     {n}

@@ -190,7 +190,7 @@ const Footer = memo(function Footer({ settings = {} }) {
               Explore
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {[["featured","Featured"],["menu","Full Menu"],["about","About Us"],["contact","Contact"]].map(([id, label]) => (
+              {[["Pret", "Collection"], ["Lahore", "Pakistan"]].map(([n, l]) => (([id, label]) => (
                 <button
                   key={id}
                   onClick={() => scrollTo(id)}
