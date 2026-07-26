@@ -38,13 +38,15 @@ export default function CheckoutForm({ cart, total, onBack, onSuccess, settings 
 
     try {
       const orderItems = cart.map((i) => ({
-        id:       i.id,
-        name:     i.name,
-        price:    i.price,
-        qty:      i.qty,
-        subtotal: i.price * i.qty,
-        img:      i.img ?? "",
-      }));
+  id:             i.id,
+  name:           i.name,
+  price:          i.price,
+  basePrice:      i.basePrice ?? i.price,
+  qty:            i.qty,
+  subtotal:       i.price * i.qty,
+  img:            i.img ?? "",
+  selectedAddons: Array.isArray(i.selectedAddons) ? i.selectedAddons : [],
+}));
 
       await addDoc(collection(db, "orders"), {
         customerName: form.customerName.trim(),
