@@ -119,7 +119,7 @@ export default function Navbar({ cartCount, onCartOpen, cartBouncing, settings =
 
   const navLinks = useMemo(() => [
     { label: "Featured", id: "featured" },
-    { label: "Menu",     id: "menu"     },
+    { label: "Collection",     id: "Collection"     },
     { label: "About",    id: "about"    },
     { label: "Contact",  id: "contact"  },
   ], []);
