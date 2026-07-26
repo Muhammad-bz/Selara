@@ -764,12 +764,13 @@ export default function Settings() {
               </Field>
 
               <Field label="YouTube" labelIcon={Youtube}>
-                <Input value={values.youtube} onChange={field("youtube")} placeholder="https://youtube.com/@yourstore" type="url" />
-              </Field>
-            </div>
-          </SectionCard>
+            <Input value={values.youtube} onChange={field("youtube")} placeholder="https://youtube.com/@yourstore" type="url" />
+          </Field>
+        </div>
+      </SectionCard>
 
-  
+        </div>
+      </div>
     </>
   );
 }
