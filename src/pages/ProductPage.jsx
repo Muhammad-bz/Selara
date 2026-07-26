@@ -36,32 +36,34 @@ function getImages(product) {
 ───────────────────────────────────────────── */
 function ImageCarousel({ images, alt, tag }) {
   const [active,   setActive]   = useState(0);
-  const [fading,   setFading]   = useState(false);
   const [lightbox, setLightbox] = useState(false);
   const autoRef  = useRef(null);
   const touchRef = useRef(null);
 
   useEffect(() => { setActive(0); }, [images]);
 
+  // Preload all images upfront so crossfade never shows blank
+  useEffect(() => {
+    images.forEach((src) => { const img = new Image(); img.src = src; });
+  }, [images]);
+
   const goTo = useCallback((idx) => {
-    if (idx === active) return;
-    setFading(true);
-    setTimeout(() => { setActive(idx); setFading(false); }, 280);
-  }, [active]);
+    setActive(idx);
+  }, []);
 
-  const prev = useCallback(() => goTo((active - 1 + images.length) % images.length), [active, images.length, goTo]);
-  const next = useCallback(() => goTo((active + 1) % images.length), [active, images.length, goTo]);
+  const prev = useCallback(() => setActive((a) => (a - 1 + images.length) % images.length), [images.length]);
+  const next = useCallback(() => setActive((a) => (a + 1) % images.length), [images.length]);
 
-  /* Auto-advance every 4 s */
+  /* Auto-advance every 6s */
   useEffect(() => {
     if (images.length < 2) return;
-    autoRef.current = setInterval(next, 4000);
+    autoRef.current = setInterval(next, 6000);
     return () => clearInterval(autoRef.current);
   }, [next, images.length]);
 
   const resetAuto = useCallback(() => {
     clearInterval(autoRef.current);
-    if (images.length > 1) autoRef.current = setInterval(next, 4000);
+    if (images.length > 1) autoRef.current = setInterval(next, 6000);
   }, [next, images.length]);
 
   /* Swipe */
@@ -106,20 +108,24 @@ function ImageCarousel({ images, alt, tag }) {
         onTouchEnd={onTouchEnd}
       >
         <div style={{ position: "relative", paddingBottom: "130%" }}>
-          <img
-            key={active}
-            src={images[active]}
-            alt={`${alt} ${active + 1}`}
-            loading={active === 0 ? "eager" : "lazy"}
-            decoding="async"
-            style={{
-              position: "absolute", inset: 0,
-              width: "100%", height: "100%",
-              objectFit: "cover",
-              opacity: fading ? 0 : 1,
-              transition: "opacity 0.28s ease",
-            }}
-          />
+          {/* All images stacked — opacity crossfade, no remount, no blank flash */}
+          {images.map((src, i) => (
+            <img
+              key={src}
+              src={src}
+              alt={i === 0 ? alt : ""}
+              loading="eager"
+              decoding="async"
+              style={{
+                position: "absolute", inset: 0,
+                width: "100%", height: "100%",
+                objectFit: "cover",
+                opacity: i === active ? 1 : 0,
+                transition: "opacity 0.75s ease",
+                zIndex: i === active ? 1 : 0,
+              }}
+            />
+          ))}
         </div>
 
         {/* Tag */}
@@ -266,8 +272,7 @@ function ImageCarousel({ images, alt, tag }) {
             style={{
               maxWidth: "90vw", maxHeight: "90vh",
               objectFit: "contain",
-              opacity: fading ? 0 : 1,
-              transition: "opacity 0.28s ease",
+              transition: "opacity 0.3s ease",
               userSelect: "none",
             }}
           />
@@ -410,24 +415,48 @@ export default function ProductPage() {
     return products.filter((p) => p.id !== product.id && p.category === product.category).slice(0, 4);
   }, [products, product]);
 
-  const [selectedSize, setSelectedSize] = useState(null);
-  const [qty,          setQty]          = useState(1);
-  const [added,        setAdded]        = useState(false);
-  const [sizeError,    setSizeError]    = useState(false);
+  const [selectedSize,   setSelectedSize]   = useState(null);
+  const [qty,            setQty]            = useState(1);
+  const [added,          setAdded]          = useState(false);
+  const [sizeError,      setSizeError]      = useState(false);
+  const [selectedAddons, setSelectedAddons] = useState(new Set());
 
   useEffect(() => {
-    setSelectedSize(null); setQty(1); setAdded(false); setSizeError(false);
+    setSelectedSize(null); setQty(1); setAdded(false); setSizeError(false); setSelectedAddons(new Set());
   }, [id]);
+
+  const toggleAddon = useCallback((idx) => {
+    setSelectedAddons((prev) => {
+      const next = new Set(prev);
+      next.has(idx) ? next.delete(idx) : next.add(idx);
+      return next;
+    });
+  }, []);
+
+  const addonTotal = useMemo(() => {
+    if (!product?.addons) return 0;
+    return [...selectedAddons].reduce((sum, idx) => sum + (Number(product.addons[idx]?.price) || 0), 0);
+  }, [selectedAddons, product]);
 
   const hasSizes = product?.sizes?.length > 0;
   const wished   = wishlist.has(product?.id);
 
   const handleAdd = useCallback(() => {
     if (hasSizes && !selectedSize) { setSizeError(true); return; }
-    addToCart({ ...product, selectedSize, qty });
+    const chosenAddons = product?.addons
+      ? [...selectedAddons].map((idx) => product.addons[idx]).filter(Boolean)
+      : [];
+    addToCart({
+      ...product,
+      selectedSize,
+      qty,
+      price:          (Number(product.price) || 0) + addonTotal,
+      basePrice:      product.price,
+      selectedAddons: chosenAddons,
+    });
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
-  }, [addToCart, product, selectedSize, qty, hasSizes]);
+  }, [addToCart, product, selectedSize, qty, hasSizes, selectedAddons, addonTotal]);
 
   /* ── Shared navbar + shell ── */
   /* forceScrolled makes the navbar render in its "scrolled" (dark, compact) 
@@ -565,44 +594,85 @@ export default function ProductPage() {
               {product.name}
             </h1>
 
-            <p style={{
-              fontFamily: FONT_DISPLAY, fontSize: "clamp(20px, 2.5vw, 26px)", fontWeight: 400,
-              color: C.slate, marginBottom: 24,
-            }}>
-              {fmt(product.price)}
-            </p>
+            <div style={{ marginBottom: 24, display: "flex", alignItems: "baseline", gap: 10 }}>
+              <p style={{
+                fontFamily: FONT_DISPLAY, fontSize: "clamp(20px, 2.5vw, 26px)", fontWeight: 400,
+                color: C.slate, margin: 0,
+              }}>
+                {fmt((Number(product.price) || 0) + addonTotal)}
+              </p>
+              {addonTotal > 0 && (
+                <span style={{ fontFamily: FONT_BODY, fontSize: 12, color: C.mist }}>
+                  incl. add-ons
+                </span>
+              )}
+            </div>
 
-            {/* Add-ons */}
-            {Array.isArray(product.addons) && product.addons.filter(a => a.name).length > 0 && (
-              <div style={{ marginBottom: 20 }}>
-                {product.addons.filter(a => a.name).map((addon, i) => (
-                  <div key={i} style={{
-                    display: "flex", alignItems: "center", gap: 10,
-                    marginBottom: 8,
-                  }}>
-                    {addon.imageUrl && (
-                      <img
-                        src={addon.imageUrl}
-                        alt={addon.name}
-                        style={{
-                          width: 38, height: 38, objectFit: "cover",
-                          border: `1px solid ${C.line}`, flexShrink: 0,
-                        }}
-                      />
-                    )}
-                    <p style={{
-                      fontFamily: FONT_BODY, fontSize: 12, fontWeight: 400,
-                      color: C.mist, margin: 0,
-                      display: "flex", alignItems: "center", gap: 5,
-                    }}>
-                      <span style={{ color: C.rose, fontWeight: 600, fontSize: 13 }}>+</span>
-                      <span style={{ color: C.slate }}>{addon.name}</span>
+            {/* ── Selectable Add-ons ── */}
+            {Array.isArray(product.addons) && product.addons.filter(a => a?.name).length > 0 && (
+              <div style={{ marginBottom: 24 }}>
+                <p style={{
+                  fontFamily: FONT_BODY, fontSize: 9, fontWeight: 500,
+                  letterSpacing: "0.18em", textTransform: "uppercase",
+                  color: C.charcoal, marginBottom: 12,
+                }}>
+                  Add-ons
+                </p>
+                {product.addons.map((addon, i) =>
+                  addon?.name ? (
+                    <div
+                      key={i}
+                      onClick={() => toggleAddon(i)}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 12,
+                        padding: "10px 14px", marginBottom: 6,
+                        border: `1px solid ${selectedAddons.has(i) ? C.rose : C.line}`,
+                        background: selectedAddons.has(i) ? "rgba(242,196,206,0.15)" : "transparent",
+                        cursor: "pointer",
+                        transition: "background 0.18s, border-color 0.18s",
+                      }}
+                    >
+                      {/* Checkbox */}
+                      <span style={{
+                        width: 16, height: 16, flexShrink: 0, borderRadius: 3,
+                        border: `1.5px solid ${selectedAddons.has(i) ? C.rose : C.mist}`,
+                        background: selectedAddons.has(i) ? C.rose : "transparent",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        transition: "background 0.18s, border-color 0.18s",
+                      }}>
+                        {selectedAddons.has(i) && <Check size={10} color="#fff" strokeWidth={3} />}
+                      </span>
+
+                      {/* Addon image if available */}
+                      {addon.imageUrl && (
+                        <img
+                          src={addon.imageUrl} alt={addon.name}
+                          style={{ width: 40, height: 40, objectFit: "cover", border: `1px solid ${C.line}`, flexShrink: 0 }}
+                        />
+                      )}
+
+                      {/* Name */}
+                      <span style={{
+                        fontFamily: FONT_BODY, fontSize: 13, fontWeight: 400,
+                        color: selectedAddons.has(i) ? C.charcoal : C.mist,
+                        flex: 1, transition: "color 0.18s",
+                      }}>
+                        {addon.name}
+                      </span>
+
+                      {/* Price */}
                       {addon.price ? (
-                        <span>— PKR {Number(addon.price).toLocaleString()}</span>
+                        <span style={{
+                          fontFamily: FONT_BODY, fontSize: 13, fontWeight: 500,
+                          color: selectedAddons.has(i) ? C.rose : C.slate,
+                          flexShrink: 0, transition: "color 0.18s",
+                        }}>
+                          +PKR {Number(addon.price).toLocaleString()}
+                        </span>
                       ) : null}
-                    </p>
-                  </div>
-                ))}
+                    </div>
+                  ) : null
+                )}
               </div>
             )}
 

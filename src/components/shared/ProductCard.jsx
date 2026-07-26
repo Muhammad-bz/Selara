@@ -1,91 +1,27 @@
 // src/components/shared/ProductCard.jsx
-import React, { memo, useState, useCallback, useEffect, useRef } from "react";
+import React, { memo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Heart, Check, Plus } from "lucide-react";
 import { C, FONT_DISPLAY, FONT_BODY, fmt } from "../../constants/theme";
 
-/* Resolve all images for a product */
-function resolveImages(product) {
-  if (Array.isArray(product.images) && product.images.length > 0) return product.images;
-  const single = product.mainImage || product.imageUrl || product.img;
-  return single ? [single] : [];
-}
-
 /* ═══════════════════════════════════════════════
-   PRODUCT CARD
-   - Carousel crossfades (no blank flash, no remount)
-   - Auto-advances every 6s
-   - Add-ons are selectable; price updates live
+   PRODUCT CARD — single cover image only.
+   Carousel lives on the product page.
 ═══════════════════════════════════════════════ */
 const ProductCard = memo(function ProductCard({ product, onAdd, wishlist, toggleWish }) {
   const navigate = useNavigate();
-  const [added,          setAdded]          = useState(false);
-  const [imgErr,         setImgErr]         = useState(false);
-  const [active,         setActive]         = useState(0);
-  const [selectedAddons, setSelectedAddons] = useState(new Set());
-  const autoRef = useRef(null);
-  const wished  = wishlist?.has(product.id);
+  const [added,  setAdded]  = useState(false);
+  const [imgErr, setImgErr] = useState(false);
+  const wished = wishlist?.has(product.id);
 
-  const images  = resolveImages(product);
-  const hasMany = images.length > 1;
-
-  // Preload all images on mount so crossfade never flashes
-  useEffect(() => {
-    images.forEach((src) => {
-      const img = new Image();
-      img.src = src;
-    });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const goTo = useCallback((idx) => {
-    setActive(idx);
-  }, []);
-
-  const next = useCallback(() => {
-    setActive((prev) => (prev + 1) % images.length);
-  }, [images.length]);
-
-  // Auto-advance every 6s
-  useEffect(() => {
-    if (!hasMany) return;
-    autoRef.current = setInterval(next, 6000);
-    return () => clearInterval(autoRef.current);
-  }, [next, hasMany]);
-
-  // Toggle an add-on on/off
-  const toggleAddon = useCallback((e, idx) => {
-    e.stopPropagation();
-    setSelectedAddons((prev) => {
-      const next = new Set(prev);
-      next.has(idx) ? next.delete(idx) : next.add(idx);
-      return next;
-    });
-  }, []);
-
-  // Compute total price including selected add-ons
-  const addonTotal = Array.isArray(product.addons)
-    ? [...selectedAddons].reduce((sum, idx) => {
-        const p = Number(product.addons[idx]?.price ?? 0);
-        return sum + p;
-      }, 0)
-    : 0;
-  const effectivePrice = (Number(product.price) || 0) + addonTotal;
+  const coverImage = product.mainImage || product.imageUrl || product.img || "";
 
   const handleAdd = useCallback((e) => {
     e.stopPropagation();
-    const chosenAddons = Array.isArray(product.addons)
-      ? [...selectedAddons].map((idx) => product.addons[idx]).filter(Boolean)
-      : [];
-    onAdd({
-      ...product,
-      qty:          1,
-      price:        effectivePrice,   // effective price already includes add-ons
-      basePrice:    product.price,    // keep original for reference
-      selectedAddons: chosenAddons,
-    });
+    onAdd({ ...product, qty: 1 });
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
-  }, [onAdd, product, selectedAddons, effectivePrice]);
+  }, [onAdd, product]);
 
   const handleToggleWish = useCallback((e) => {
     e.stopPropagation();
@@ -96,8 +32,6 @@ const ProductCard = memo(function ProductCard({ product, onAdd, wishlist, toggle
     navigate(`/product/${product.id}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [navigate, product.id]);
-
-  const hasAddons = Array.isArray(product.addons) && product.addons.some((a) => a?.name);
 
   return (
     <div
@@ -110,47 +44,38 @@ const ProductCard = memo(function ProductCard({ product, onAdd, wishlist, toggle
         contain: "layout style",
       }}
     >
-      {/* ── Image / Crossfade Carousel — clickable ── */}
+      {/* ── Cover Image ── */}
       <div
         onClick={goToProduct}
         style={{ position: "relative", paddingBottom: "125%", overflow: "hidden", flexShrink: 0, cursor: "pointer" }}
       >
-        {imgErr || images.length === 0 ? (
-          <div className="img-placeholder" style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }} />
+        {imgErr || !coverImage ? (
+          <div className="img-placeholder" style={{ position: "absolute", inset: 0 }} />
         ) : (
-          <>
-            {/* Stack ALL images; only the active one is visible — pure CSS crossfade, no remount */}
-            {images.map((src, i) => (
-              <img
-                key={src}
-                src={src}
-                alt={i === 0 ? product.name : ""}
-                loading="eager"
-                decoding="async"
-                onError={() => { if (i === 0) setImgErr(true); }}
-                style={{
-                  position: "absolute", top: 0, left: 0,
-                  width: "100%", height: "100%",
-                  objectFit: "cover",
-                  opacity: i === active ? 1 : 0,
-                  transition: "opacity 0.8s ease, transform 0.55s cubic-bezier(0.16,1,0.3,1)",
-                  willChange: "opacity, transform",
-                  zIndex: i === active ? 1 : 0,
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.06)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
-              />
-            ))}
-          </>
+          <img
+            src={coverImage}
+            alt={product.name}
+            loading="lazy"
+            decoding="async"
+            onError={() => setImgErr(true)}
+            style={{
+              position: "absolute", inset: 0,
+              width: "100%", height: "100%",
+              objectFit: "cover",
+              transition: "transform 0.55s cubic-bezier(0.16,1,0.3,1)",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.06)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; }}
+          />
         )}
 
         {product.tag && (
           <span style={{
-            position: "absolute", top: 12, left: 12,
+            position: "absolute", top: 12, left: 12, zIndex: 1,
             background: C.rose, color: "#fff",
             fontFamily: FONT_BODY, fontSize: 8, fontWeight: 500,
             letterSpacing: "0.18em", textTransform: "uppercase",
-            padding: "5px 10px", zIndex: 2,
+            padding: "5px 10px",
           }}>
             {product.tag}
           </span>
@@ -161,12 +86,11 @@ const ProductCard = memo(function ProductCard({ product, onAdd, wishlist, toggle
             onClick={handleToggleWish}
             aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
             style={{
-              position: "absolute", top: 12, right: 12,
+              position: "absolute", top: 12, right: 12, zIndex: 1,
               background: "rgba(253,248,245,0.90)", border: "none",
               borderRadius: "50%", width: 34, height: 34,
               display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer", transition: "transform 0.2s, background 0.2s",
-              zIndex: 2,
+              cursor: "pointer", transition: "background 0.2s",
             }}
             onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(242,196,206,0.95)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(253,248,245,0.90)"; }}
@@ -175,49 +99,22 @@ const ProductCard = memo(function ProductCard({ product, onAdd, wishlist, toggle
           </button>
         )}
 
-        {/* Dot indicators */}
-        {hasMany && (
-          <div
-            style={{
-              position: "absolute", bottom: 8, left: "50%",
-              transform: "translateX(-50%)",
-              display: "flex", gap: 4, zIndex: 2,
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {images.map((_, i) => (
-              <button
-                key={i}
-                onClick={(e) => { e.stopPropagation(); clearInterval(autoRef.current); goTo(i); }}
-                aria-label={`Image ${i + 1}`}
-                style={{
-                  width: i === active ? 16 : 5, height: 5,
-                  background: i === active ? C.rose : "rgba(253,248,245,0.55)",
-                  border: "none", padding: 0, cursor: "pointer",
-                  transition: "width 0.28s ease, background 0.28s ease",
-                }}
-              />
-            ))}
-          </div>
-        )}
-
         {/* Quick-add overlay on hover */}
         <div
           onClick={(e) => { e.stopPropagation(); handleAdd(e); }}
+          className="card-quick-add"
           style={{
-            position: "absolute", bottom: 0, left: 0, right: 0,
+            position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 1,
             background: added ? C.rose : "rgba(28,28,28,0.82)",
             color: "#fff",
             fontFamily: FONT_BODY, fontSize: 10, fontWeight: 500,
             letterSpacing: "0.18em", textTransform: "uppercase",
             padding: "13px",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-            opacity: 0,
-            transform: "translateY(4px)",
+            opacity: 0, transform: "translateY(4px)",
             transition: "opacity 0.3s ease, transform 0.3s ease, background 0.2s",
-            cursor: "pointer", zIndex: 3,
+            cursor: "pointer",
           }}
-          className="card-quick-add"
         >
           {added ? <><Check size={11} /> Added to bag</> : <><Plus size={11} /> Add to bag</>}
         </div>
@@ -241,76 +138,37 @@ const ProductCard = memo(function ProductCard({ product, onAdd, wishlist, toggle
         {product.desc && (
           <p style={{
             fontFamily: FONT_BODY, fontSize: 12, fontWeight: 300,
-            color: C.mist, lineHeight: 1.6, marginBottom: 10,
+            color: C.mist, lineHeight: 1.6, flex: 1, marginBottom: 10,
           }}>
             {product.desc}
           </p>
         )}
 
-        {/* ── Selectable Add-ons ── */}
-        {hasAddons && (
-          <div style={{ marginBottom: 10 }}>
+        {/* Add-ons — display only on card, selectable on product page */}
+        {Array.isArray(product.addons) && product.addons.some(a => a?.name) && (
+          <div style={{ marginBottom: 8 }}>
             {product.addons.map((addon, i) =>
               addon?.name ? (
-                <div
-                  key={i}
-                  onClick={(e) => toggleAddon(e, i)}
-                  style={{
-                    display: "flex", alignItems: "center", gap: 7,
-                    padding: "5px 7px",
-                    marginBottom: 3,
-                    borderRadius: 4,
-                    border: `1px solid ${selectedAddons.has(i) ? C.rose : "transparent"}`,
-                    background: selectedAddons.has(i) ? "rgba(242,196,206,0.18)" : "transparent",
-                    cursor: "pointer",
-                    transition: "background 0.18s, border-color 0.18s",
-                  }}
-                >
-                  {/* Custom checkbox */}
-                  <span style={{
-                    width: 13, height: 13, borderRadius: 3, flexShrink: 0,
-                    border: `1.5px solid ${selectedAddons.has(i) ? C.rose : C.mist}`,
-                    background: selectedAddons.has(i) ? C.rose : "transparent",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    transition: "background 0.18s, border-color 0.18s",
-                  }}>
-                    {selectedAddons.has(i) && (
-                      <Check size={8} color="#fff" strokeWidth={3} />
-                    )}
-                  </span>
-                  <span style={{
-                    fontFamily: FONT_BODY, fontSize: 11, fontWeight: 400,
-                    color: selectedAddons.has(i) ? C.rose : C.mist,
-                    flex: 1, transition: "color 0.18s",
-                  }}>
-                    {addon.name}
-                  </span>
+                <p key={i} style={{
+                  fontFamily: FONT_BODY, fontSize: 11, fontWeight: 400,
+                  color: C.mist, lineHeight: 1.5,
+                  display: "flex", alignItems: "center", gap: 4,
+                }}>
+                  <span style={{ color: C.rose, fontWeight: 500 }}>+</span>
+                  {addon.name}
                   {addon.price ? (
-                    <span style={{
-                      fontFamily: FONT_BODY, fontSize: 11, fontWeight: 500,
-                      color: selectedAddons.has(i) ? C.rose : C.slate,
-                      flexShrink: 0, transition: "color 0.18s",
-                    }}>
-                      +PKR {Number(addon.price).toLocaleString()}
-                    </span>
+                    <span style={{ color: C.slate }}>— PKR {Number(addon.price).toLocaleString()}</span>
                   ) : null}
-                </div>
+                </p>
               ) : null
             )}
           </div>
         )}
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: "auto", paddingTop: 8 }}>
-          <div>
-            <span style={{ fontFamily: FONT_DISPLAY, fontSize: 18, fontWeight: 400, color: C.slate }}>
-              {fmt(effectivePrice)}
-            </span>
-            {addonTotal > 0 && (
-              <span style={{ fontFamily: FONT_BODY, fontSize: 10, color: C.mist, marginLeft: 5 }}>
-                incl. add-ons
-              </span>
-            )}
-          </div>
+          <span style={{ fontFamily: FONT_DISPLAY, fontSize: 18, fontWeight: 400, color: C.slate }}>
+            {fmt(product.price)}
+          </span>
           <button
             onClick={handleAdd}
             style={{
