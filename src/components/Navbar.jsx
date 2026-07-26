@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { ShoppingBag, X, Menu, Instagram, Facebook } from "lucide-react";
 import { C, FONT_DISPLAY, FONT_BODY } from "../constants/theme";
@@ -112,14 +113,21 @@ export default function Navbar({ cartCount, onCartOpen, cartBouncing, settings =
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
-  const scrollTo = useCallback((id) => {
-    setMobileOpen(false);
-    setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" }), 50);
-  }, []);
+  const navigate = useNavigate();
+
+const scrollTo = useCallback((id) => {
+  setMobileOpen(false);
+  const el = document.getElementById(id);
+  if (el) {
+    setTimeout(() => el.scrollIntoView({ behavior: "smooth" }), 50);
+  } else {
+    navigate(`/#${id}`);
+  }
+}, [navigate]);
 
   const navLinks = useMemo(() => [
     { label: "Featured", id: "featured" },
-    { label: "Collection",     id: "Collection"     },
+    { label: "Collection", id: "menu" },
     { label: "About",    id: "about"    },
     { label: "Contact",  id: "contact"  },
   ], []);
