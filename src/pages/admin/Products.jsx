@@ -71,29 +71,49 @@ const CLOUDINARY_CLOUD_NAME = "leu4dssl";
 const CLOUDINARY_UPLOAD_PRESET = "cremeo";
 
 /* ─────────────────────────────────────────────────
-   CATEGORIES  (matches the public site's menu data)
+   CATEGORIES  — read from the same localStorage key
+   that Categories.jsx writes to, so they stay in sync.
 ───────────────────────────────────────────────── */
-const CATEGORIES = [
-  "Category A",
-  "Category B",
-  "Category C",
-  "Category D",
-  "Category E",
-  "Category F",
-  "Category G",
-  "Category H",
-  "Category I",
-  "Category J",
-  "Category K",
-  "Category L",
-  "Category M",
-  "Category N",
-  "Category O",
-  "Category P",
-  "Category Q",
-  "Category R",
-  "Category S",
-];
+const CAT_LS_KEY = "cremeo_categories";
+
+function loadCategoryNames() {
+  try {
+    const raw = localStorage.getItem(CAT_LS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed
+          .filter((c) => c.active !== false)   // only active categories
+          .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
+          .map((c) => c.name)
+          .filter(Boolean);
+      }
+    }
+  } catch (_) {}
+  return [];
+}
+
+/** Hook — returns live category name list, re-reads when storage changes */
+function useCategoryNames(firestoreProducts) {
+  const [names, setNames] = useState(() => loadCategoryNames());
+
+  // Re-read whenever another tab or this tab writes to localStorage
+  useEffect(() => {
+    const onStorage = () => setNames(loadCategoryNames());
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  // Merge with any categories that exist on Firestore products but not in localStorage yet
+  return useMemo(() => {
+    const fromStorage = loadCategoryNames();
+    const fromProducts = firestoreProducts
+      .map((p) => p.category)
+      .filter(Boolean);
+    const merged = [...new Set([...fromStorage, ...fromProducts])];
+    return merged.length > 0 ? merged : fromStorage;
+  }, [names, firestoreProducts]); // eslint-disable-line react-hooks/exhaustive-deps
+}
 
 /* ─────────────────────────────────────────────────
    FIRESTORE INSTANCE
@@ -105,7 +125,7 @@ const db = getFirestore(app);
 ───────────────────────────────────────────────── */
 const EMPTY_FORM = {
   name:        "",
-  category:    CATEGORIES[0],
+  category:    "",
   description: "",
   price:       "",
   featured:    false,
@@ -952,7 +972,7 @@ function AddonRow({ addon, idx, onChange, onRemove, disabled }) {
   );
 }
 
-function ProductModal({ mode, initial, onSave, onClose }) {
+function ProductModal({ mode, initial, categories, onSave, onClose }) {
   // Normalise initial: populate images/mainImage from legacy imageUrl if needed
   const normaliseInitial = (src) => {
     const base = { ...EMPTY_FORM, ...src };
@@ -1119,7 +1139,8 @@ function ProductModal({ mode, initial, onSave, onClose }) {
                 value={form.category}
                 onChange={set("category")}
               >
-                {CATEGORIES.map((c) => (
+                <option value="">— Select a category —</option>
+                {(categories ?? []).map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
@@ -1389,7 +1410,7 @@ function DeleteDialog({ product, onConfirm, onClose }) {
 /* ─────────────────────────────────────────────────
    TOOLBAR
 ───────────────────────────────────────────────── */
-function Toolbar({ query, setQuery, category, setCategory, onAdd, total, filtered }) {
+function Toolbar({ query, setQuery, category, setCategory, categories, onAdd, total, filtered }) {
   return (
     <div className="crm-toolbar">
       {/* Search */}
@@ -1416,7 +1437,7 @@ function Toolbar({ query, setQuery, category, setCategory, onAdd, total, filtere
         style={{ minWidth: 0 }}
       >
         <option value="">All categories</option>
-        {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+        {(categories ?? []).map((c) => <option key={c} value={c}>{c}</option>)}
       </select>
 
       {/* Count */}
@@ -1645,6 +1666,9 @@ export default function Products() {
   /* Data layer */
   const { products, loading, error, addProduct, updateProduct, deleteProduct } = useProducts();
 
+  /* Live category list from Categories admin page (localStorage) */
+  const categoryNames = useCategoryNames(products);
+
   /* UI state */
   const [query,    setQuery]    = useState("");
   const [category, setCategory] = useState("");
@@ -1713,6 +1737,7 @@ export default function Products() {
         <Toolbar
           query={query}       setQuery={setQuery}
           category={category} setCategory={setCategory}
+          categories={categoryNames}
           onAdd={openAdd}
           total={products.length}
           filtered={visible.length}
@@ -1734,7 +1759,8 @@ export default function Products() {
       {modal && (
         <ProductModal
           mode={modal.mode}
-          initial={modal.product ?? EMPTY_FORM}
+          initial={modal.product ?? { ...EMPTY_FORM, category: categoryNames[0] ?? "" }}
+          categories={categoryNames}
           onSave={handleSave}
           onClose={() => setModal(null)}
         />

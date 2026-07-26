@@ -772,11 +772,17 @@ function OrderModal({ order, onClose }) {
   const displayItems = useMemo(() => {
     if (!order.rawItems?.length) return [];
     return order.rawItems.map((item) => {
-      if (typeof item === "string") return { name: item, qty: 1, price: null };
+      if (typeof item === "string") return { name: item, qty: 1, price: null, basePrice: null, addons: [] };
+      const qty       = item.qty ?? item.quantity ?? 1;
+      const basePrice = item.basePrice ?? null;
+      // item.price has addon total baked in; use basePrice separately if available
+      const price     = basePrice != null ? basePrice : (item.price ?? item.unitPrice ?? null);
+      const addons    = Array.isArray(item.selectedAddons) ? item.selectedAddons : [];
       return {
-        name:  item.name  ?? item.title ?? "Item",
-        qty:   item.qty   ?? item.quantity ?? 1,
-        price: item.price ?? item.unitPrice ?? null,
+        name: item.name ?? item.title ?? "Item",
+        qty,
+        price,      // product base price only
+        addons,     // [{name, price}, ...]
       };
     });
   }, [order.rawItems]);
@@ -912,16 +918,48 @@ function OrderModal({ order, onClose }) {
                 </thead>
                 <tbody>
                   {displayItems.map((item, i) => (
-                    <tr key={i}>
-                      <td style={{ fontWeight: 500 }}>{item.name}</td>
-                      <td style={{ textAlign: "center", color: C.mist }}>×{item.qty}</td>
-                      <td>
-                        {item.price != null
-                          ? `Rs. ${Number(item.price * item.qty).toLocaleString()}`
-                          : <span style={{ color: C.mist, fontSize: 12 }}>—</span>
-                        }
-                      </td>
-                    </tr>
+                    <React.Fragment key={i}>
+                      {/* Main product row */}
+                      <tr>
+                        <td style={{ fontWeight: 500 }}>{item.name}</td>
+                        <td style={{ textAlign: "center", color: C.mist }}>×{item.qty}</td>
+                        <td>
+                          {item.price != null
+                            ? `Rs. ${Number(item.price * item.qty).toLocaleString()}`
+                            : <span style={{ color: C.mist, fontSize: 12 }}>—</span>
+                          }
+                        </td>
+                      </tr>
+                      {/* Add-on sub-rows */}
+                      {item.addons.map((addon, j) => (
+                        <tr key={`addon-${i}-${j}`} style={{ background: "rgba(201,129,143,0.04)" }}>
+                          <td style={{ paddingLeft: 28, fontSize: 12, color: C.mist, fontStyle: "italic" }}>
+                            <span style={{
+                              display: "inline-block",
+                              marginRight: 6,
+                              color: C.chocolate,
+                              fontSize: 10,
+                              fontStyle: "normal",
+                              fontWeight: 600,
+                              letterSpacing: "0.05em",
+                              background: "rgba(201,129,143,0.10)",
+                              padding: "1px 6px",
+                              borderRadius: 4,
+                            }}>
+                              ADD-ON
+                            </span>
+                            {addon.name ?? "—"}
+                          </td>
+                          <td style={{ textAlign: "center", color: C.mist, fontSize: 12 }}>×{item.qty}</td>
+                          <td style={{ fontSize: 12, color: C.mist }}>
+                            {addon.price != null
+                              ? `Rs. ${Number(addon.price * item.qty).toLocaleString()}`
+                              : <span style={{ fontSize: 11 }}>—</span>
+                            }
+                          </td>
+                        </tr>
+                      ))}
+                    </React.Fragment>
                   ))}
                 </tbody>
               </table>

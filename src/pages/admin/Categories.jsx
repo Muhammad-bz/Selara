@@ -63,7 +63,11 @@ function loadCategories() {
 }
 
 function saveCategories(cats) {
-  try { localStorage.setItem(LS_KEY, JSON.stringify(cats)); } catch (_) {}
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(cats));
+    // Dispatch a storage event so same-tab listeners (Products.jsx) pick up the change
+    window.dispatchEvent(new StorageEvent("storage", { key: LS_KEY }));
+  } catch (_) {}
 }
 
 function loadNextId() {
