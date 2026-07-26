@@ -775,35 +775,44 @@ function OrderModal({ order, onClose }) {
 
   // Resolve raw items for display
   const displayItems = useMemo(() => {
-    if (!order.rawItems?.length) return [];
-    return order.rawItems.map((item) => {
-      if (typeof item === "string") return { name: item, qty: 1, price: null, addons: [] };
-      const qty = item.qty ?? item.quantity ?? 1;
+  if (!order.rawItems?.length) return [];
+  return order.rawItems.map((item, i) => {
+    if (typeof item === "string") return { name: item, qty: 1, price: null, addons: [] };
+    const qty = item.qty ?? item.quantity ?? 1;
 
-      // Use basePrice when available (set by the updated ProductPage);
-      // fall back to item.price for older orders
-      const price = item.basePrice != null
-        ? item.basePrice
-        : (item.price ?? item.unitPrice ?? null);
+    const price = item.basePrice != null
+      ? item.basePrice
+      : (item.price ?? item.unitPrice ?? null);
 
-      // Support every field name the cart/Firestore might use
-      const rawAddons =
-        item.selectedAddons ??
-        item.addons         ??
-        item.chosenAddons   ??
-        [];
-      const addons = Array.isArray(rawAddons)
-        ? rawAddons.filter((a) => a && (a.name || a.title))
-        : [];
+    // Try selectedAddons first, then filter out the full catalog
+    // by cross-referencing the baked-in price delta
+    let rawAddons =
+      item.selectedAddons ??
+      item.chosenAddons   ??
+      [];
 
-      return {
-        name: item.name ?? item.title ?? "Item",
-        qty,
-        price,
-        addons, // [{ name, price }, ...]
-      };
-    });
-  }, [order.rawItems]);
+    // If selectedAddons was saved empty but itemNames string has addon info, parse it
+    // itemNames format: "Product Name (+Addon1, Addon2)"
+    if ((!Array.isArray(rawAddons) || rawAddons.length === 0)) {
+      const nameStr = order.items?.[i] ?? "";
+      const match = nameStr.match(/\(\+(.+)\)$/);
+      if (match) {
+        rawAddons = match[1].split(", ").map((n) => ({ name: n.trim() }));
+      }
+    }
+
+    const addons = Array.isArray(rawAddons)
+      ? rawAddons.filter((a) => a && (a.name || a.title))
+      : [];
+
+    return {
+      name: item.name ?? item.title ?? "Item",
+      qty,
+      price,
+      addons,
+    };
+  });
+}, [order.rawItems, order.items]);
 
   const s = STATUS[localStatus] ?? STATUS.pending;
 
