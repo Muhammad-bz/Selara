@@ -88,8 +88,7 @@ export default function PublicPage() {
         <FeaturedSection onAdd={addToCart} wishlist={wishlist} toggleWish={toggleWish} products={products} loading={loading} error={error} />
         <MenuSection     onAdd={addToCart} wishlist={wishlist} toggleWish={toggleWish} products={products} loading={loading} error={error} />
         <AboutSection settings={settings} />
-        <ContactSection settings={settings} />
-      </main>
+        
 
       <Footer settings={settings} />
 

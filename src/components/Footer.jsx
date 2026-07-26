@@ -214,17 +214,17 @@ const Footer = memo(function Footer({ settings = {} }) {
           <div>
             <p style={{ fontFamily: FONT_BODY, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: C.blush, marginBottom: 16 }}>
               Hours
-            </p>
-            <p style={{ fontFamily: FONT_BODY, fontSize: 13, fontWeight: 300, color: "rgba(250,246,239,0.45)", lineHeight: 2, whiteSpace: "pre-line" }}>
-              {settings.openingTime && settings.closingTime
-                ? `${settings.openingTime} – ${settings.closingTime}${(settings.closedDays || []).length ? `\nClosed: ${(settings.closedDays || []).join(", ")}` : ""}`
-                : `Mon – Sat\n7:00 AM – 9:00 PM\n\nSunday\n8:00 AM – 6:00 PM`}
-            </p>
-          </div>
-
-          {/* Contact form */}
-          <ContactForm />
-        </div>
+            {/* Hours */}
+<div>
+  <p style={{ fontFamily: FONT_BODY, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: C.blush, marginBottom: 16 }}>
+    Hours
+  </p>
+  <p style={{ fontFamily: FONT_BODY, fontSize: 13, fontWeight: 300, color: "rgba(250,246,239,0.45)", lineHeight: 2, whiteSpace: "pre-line" }}>
+    {settings.openingTime && settings.closingTime
+      ? `${settings.openingTime} – ${settings.closingTime}${(settings.closedDays || []).length ? `\nClosed: ${(settings.closedDays || []).join(", ")}` : ""}`
+      : `Mon – Sat\n7:00 AM – 9:00 PM\n\nSunday\n8:00 AM – 6:00 PM`}
+  </p>
+</div>
 
         {/* Bottom bar */}
         <div style={{

@@ -68,19 +68,12 @@ const DEFAULTS = {
   phone:         "",
   whatsapp:      "",
   email:         "",
-  address:       "",
-  mapsEmbedUrl:  "",
   /* Social */
   instagram:     "",
   facebook:      "",
   tiktok:        "",
   youtube:       "",
-  /* Business hours & delivery */
-  openingTime:   "08:00",
-  closingTime:   "22:00",
-  closedDays:    [],
-  deliveryFee:   "",
-  minimumOrder:  "",
+
 };
 
 function settingsEqual(a, b) {
@@ -751,13 +744,7 @@ export default function Settings() {
                 <Input value={values.email} onChange={field("email")} placeholder="hello@yourstore.com" type="email" />
               </Field>
 
-              <Field label="Google Maps Embed URL" labelIcon={MapPin}>
-                <Input value={values.mapsEmbedUrl} onChange={field("mapsEmbedUrl")} placeholder="https://maps.google.com/maps?..." type="url" />
-              </Field>
-
-              <Field label="Address" labelIcon={MapPin} full>
-                <Textarea value={values.address} onChange={field("address")} placeholder="Full street address, city, country" rows={2} />
-              </Field>
+              
             </div>
           </SectionCard>
 
@@ -782,41 +769,7 @@ export default function Settings() {
             </div>
           </SectionCard>
 
-          {/* ── 4. Opening Hours & Delivery ── */}
-          <SectionCard icon={Store} title="Opening Hours & Delivery" subtitle="When you're open and your delivery pricing" delay={0.12}>
-            <div className="set-grid">
-              <Field label="Opening Time">
-                <input className="set-input" type="time" value={values.openingTime} onChange={field("openingTime")} />
-              </Field>
-
-              <Field label="Closing Time">
-                <input className="set-input" type="time" value={values.closingTime} onChange={field("closingTime")} />
-              </Field>
-
-              <Field label="Delivery Fee" labelIcon={DollarSign}>
-                <Input value={values.deliveryFee} onChange={field("deliveryFee")} placeholder="e.g. 150" />
-              </Field>
-
-              <Field label="Minimum Order" labelIcon={DollarSign}>
-                <Input value={values.minimumOrder} onChange={field("minimumOrder")} placeholder="e.g. 500" />
-              </Field>
-
-              <Field label="Closed On" full>
-                <p style={{ fontFamily: FONT_BODY, fontSize: 12, color: C.mist, opacity: 0.75, marginBottom: 10, lineHeight: 1.45 }}>
-                  Tap any day to mark it as closed.
-                  {values.closedDays.length > 0 && (
-                    <span style={{ color: C.chocolate, fontWeight: 600 }}>
-                      {" "}{values.closedDays.length} day{values.closedDays.length > 1 ? "s" : ""} selected.
-                    </span>
-                  )}
-                </p>
-                <DayPills value={values.closedDays} onChange={setClosedDays} />
-              </Field>
-            </div>
-          </SectionCard>
-
-        </div>
-      </div>
+  
     </>
   );
 }
