@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Heart, Check, Plus } from "lucide-react";
 import { C, FONT_DISPLAY, FONT_BODY, fmt } from "../../constants/theme";
 
-/* Resolve all images for a product (supports images[], mainImage, imageUrl, img) */
+/* Resolve all images for a product (supports images[], mainImage, imageUrl, img)yes */
 function resolveImages(product) {
   if (Array.isArray(product.images) && product.images.length > 0) return product.images;
   const single = product.mainImage || product.imageUrl || product.img;
