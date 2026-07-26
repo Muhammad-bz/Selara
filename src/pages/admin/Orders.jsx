@@ -127,9 +127,14 @@ function useOrders() {
             : "—";
 
           const rawItems = Array.isArray(data.items) ? data.items : [];
-          const itemNames = rawItems.map((i) =>
-            typeof i === "string" ? i : `${i.name}${i.qty > 1 ? ` ×${i.qty}` : ""}`
-          );
+          const itemNames = rawItems.map((i) => {
+            if (typeof i === "string") return i;
+            const base   = `${i.name}${i.qty > 1 ? ` \u00d7${i.qty}` : ""}`;
+            const addons = Array.isArray(i.selectedAddons) && i.selectedAddons.length > 0
+              ? i.selectedAddons.map((a) => a?.name).filter(Boolean)
+              : [];
+            return addons.length > 0 ? `${base} (+${addons.join(", ")})` : base;
+          });
 
           return {
             id:       d.id,
@@ -772,17 +777,30 @@ function OrderModal({ order, onClose }) {
   const displayItems = useMemo(() => {
     if (!order.rawItems?.length) return [];
     return order.rawItems.map((item) => {
-      if (typeof item === "string") return { name: item, qty: 1, price: null, basePrice: null, addons: [] };
-      const qty       = item.qty ?? item.quantity ?? 1;
-      const basePrice = item.basePrice ?? null;
-      // item.price has addon total baked in; use basePrice separately if available
-      const price     = basePrice != null ? basePrice : (item.price ?? item.unitPrice ?? null);
-      const addons    = Array.isArray(item.selectedAddons) ? item.selectedAddons : [];
+      if (typeof item === "string") return { name: item, qty: 1, price: null, addons: [] };
+      const qty = item.qty ?? item.quantity ?? 1;
+
+      // Use basePrice when available (set by the updated ProductPage);
+      // fall back to item.price for older orders
+      const price = item.basePrice != null
+        ? item.basePrice
+        : (item.price ?? item.unitPrice ?? null);
+
+      // Support every field name the cart/Firestore might use
+      const rawAddons =
+        item.selectedAddons ??
+        item.addons         ??
+        item.chosenAddons   ??
+        [];
+      const addons = Array.isArray(rawAddons)
+        ? rawAddons.filter((a) => a && (a.name || a.title))
+        : [];
+
       return {
         name: item.name ?? item.title ?? "Item",
         qty,
-        price,      // product base price only
-        addons,     // [{name, price}, ...]
+        price,
+        addons, // [{ name, price }, ...]
       };
     });
   }, [order.rawItems]);
@@ -948,7 +966,7 @@ function OrderModal({ order, onClose }) {
                             }}>
                               ADD-ON
                             </span>
-                            {addon.name ?? "—"}
+                            {addon.name ?? addon.title ?? "—"}
                           </td>
                           <td style={{ textAlign: "center", color: C.mist, fontSize: 12 }}>×{item.qty}</td>
                           <td style={{ fontSize: 12, color: C.mist }}>
