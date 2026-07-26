@@ -70,7 +70,7 @@ export default function PublicPage() {
   const closeCart = useCallback(() => setCartOpen(false), []);
   const clearCart = useCallback(() => setCart([]), []);
 
-  return (
+return (
     <>
       <SiteHead settings={settings} />
       <GlobalStyles />
@@ -88,7 +88,7 @@ export default function PublicPage() {
         <FeaturedSection onAdd={addToCart} wishlist={wishlist} toggleWish={toggleWish} products={products} loading={loading} error={error} />
         <MenuSection     onAdd={addToCart} wishlist={wishlist} toggleWish={toggleWish} products={products} loading={loading} error={error} />
         <AboutSection settings={settings} />
-        
+      </main>
 
       <Footer settings={settings} />
 
