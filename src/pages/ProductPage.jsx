@@ -443,8 +443,10 @@ export default function ProductPage() {
 
   const handleAdd = useCallback(() => {
     if (hasSizes && !selectedSize) { setSizeError(true); return; }
-    const chosenAddons = product?.addons
-      ? [...selectedAddons].map((idx) => product.addons[idx]).filter(Boolean)
+    const chosenAddons = Array.isArray(product?.addons)
+      ? [...selectedAddons]
+          .map((idx) => product.addons[idx])
+          .filter((a) => a && (a.name != null || a.title != null))
       : [];
     addToCart({
       ...product,
