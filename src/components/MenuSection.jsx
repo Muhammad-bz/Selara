@@ -6,9 +6,14 @@ import ProductCard from "./shared/ProductCard";
 
 /* ═══════════════════════════════════════════════
    MENU SECTION
+   • Featured products are shown in FeaturedSection above —
+     this section displays only non-featured products so
+     nothing is duplicated on the main screen.
+   • All products are still reachable via category filter
+     and search (featured badge is shown on the card when
+     browsing by category).
    PERF: visible list is memoised — only recalculates
          when filter/sort state actually changes.
-         Category pills use stable callbacks.
 ═══════════════════════════════════════════════ */
 export default function MenuSection({ onAdd, wishlist, toggleWish, products, loading, error }) {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -16,18 +21,28 @@ export default function MenuSection({ onAdd, wishlist, toggleWish, products, loa
   const [sort,           setSort]           = useState("default");
   const scrollRef = useRef(null);
 
-  const categories = useMemo(
-    () => ["All", ...new Set(products.map((p) => p.category).filter(Boolean))],
+  /* ── Non-featured products only ─────────────────
+     Featured ones already appear in FeaturedSection.
+     Category pills + search still work across this subset.
+  ─────────────────────────────────────────────── */
+  const nonFeatured = useMemo(
+    () => products.filter((p) => !p.featured),
     [products]
+  );
+
+  const categories = useMemo(
+    () => ["All", ...new Set(nonFeatured.map((p) => p.category).filter(Boolean))],
+    [nonFeatured]
   );
 
   const visible = useMemo(() => {
     const lower = query.toLowerCase();
-    return products
+    return nonFeatured
       .filter((p) => {
         const matchCat    = activeCategory === "All" || p.category === activeCategory;
-        const matchSearch = !query || p.name.toLowerCase().includes(lower) ||
-                            p.category.toLowerCase().includes(lower);
+        const matchSearch = !query ||
+          p.name.toLowerCase().includes(lower) ||
+          p.category.toLowerCase().includes(lower);
         return matchCat && matchSearch;
       })
       .sort((a, b) => {
@@ -36,7 +51,7 @@ export default function MenuSection({ onAdd, wishlist, toggleWish, products, loa
         if (sort === "alpha")      return a.name.localeCompare(b.name);
         return 0;
       });
-  }, [products, activeCategory, query, sort]);
+  }, [nonFeatured, activeCategory, query, sort]);
 
   const handleCat = useCallback((cat) => {
     setActiveCategory(cat);
@@ -51,6 +66,9 @@ export default function MenuSection({ onAdd, wishlist, toggleWish, products, loa
   const clearQuery = useCallback(() => setQuery(""), []);
   const clearAll   = useCallback(() => { setQuery(""); setActiveCategory("All"); }, []);
 
+  /* ── Nothing to show (all products are featured) ── */
+  const allFeatured = !loading && !error && products.length > 0 && nonFeatured.length === 0;
+
   return (
     <section id="menu" className="section-pad" style={{ background: C.creamDeep, paddingTop: 72, paddingBottom: 80 }}>
       <div style={{ maxWidth: 1260, margin: "0 auto" }}>
@@ -60,7 +78,7 @@ export default function MenuSection({ onAdd, wishlist, toggleWish, products, loa
           sub="Browse by category, search for a style, or simply explore — everything Selara has to offer."
         />
 
-        {/* Search + Sort bar */}
+        {/* ── Search + Sort bar ── */}
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 28, alignItems: "center" }}>
           <div style={{ position: "relative", flex: "1 1 220px", minWidth: 0 }}>
             <input
@@ -98,6 +116,7 @@ export default function MenuSection({ onAdd, wishlist, toggleWish, products, loa
               </button>
             )}
           </div>
+
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value)}
@@ -117,46 +136,51 @@ export default function MenuSection({ onAdd, wishlist, toggleWish, products, loa
             <option value="price-desc">Price: High → Low</option>
             <option value="alpha">A → Z</option>
           </select>
-          <span style={{ fontFamily: FONT_BODY, fontSize: 12, color: C.mist, flexShrink: 0 }}>
-            {visible.length} item{visible.length !== 1 ? "s" : ""}
-          </span>
+
+          {!loading && !error && (
+            <span style={{ fontFamily: FONT_BODY, fontSize: 12, color: C.mist, flexShrink: 0 }}>
+              {visible.length} item{visible.length !== 1 ? "s" : ""}
+            </span>
+          )}
         </div>
 
-        {/* Category pills */}
-        <div
-          ref={scrollRef}
-          style={{
-            display: "flex", gap: 8, overflowX: "auto",
-            paddingBottom: 16, marginBottom: 36,
-            scrollbarWidth: "none", msOverflowStyle: "none",
-            WebkitOverflowScrolling: "touch",
-          }}
-        >
-          {categories.map((cat) => {
-            const active = cat === activeCategory;
-            return (
-              <button
-                key={cat}
-                onClick={() => handleCat(cat)}
-                style={{
-                  flexShrink: 0, padding: "8px 18px", borderRadius: 0,
-                  border: active ? `1px solid ${C.rose}` : `1px solid ${C.line}`,
-                  background: active ? C.rose : "transparent",
-                  color: active ? "#fff" : C.mist,
-                  fontFamily: FONT_BODY, fontSize: 11, fontWeight: active ? 500 : 400,
-                  letterSpacing: "0.08em", textTransform: "uppercase",
-                  cursor: "pointer",
-                  transition: "background 0.2s, color 0.2s, border-color 0.2s",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {cat}
-              </button>
-            );
-          })}
-        </div>
+        {/* ── Category pills ── */}
+        {!allFeatured && (
+          <div
+            ref={scrollRef}
+            style={{
+              display: "flex", gap: 8, overflowX: "auto",
+              paddingBottom: 16, marginBottom: 36,
+              scrollbarWidth: "none", msOverflowStyle: "none",
+              WebkitOverflowScrolling: "touch",
+            }}
+          >
+            {categories.map((cat) => {
+              const active = cat === activeCategory;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => handleCat(cat)}
+                  style={{
+                    flexShrink: 0, padding: "8px 18px", borderRadius: 0,
+                    border: active ? `1px solid ${C.rose}` : `1px solid ${C.line}`,
+                    background: active ? C.rose : "transparent",
+                    color: active ? "#fff" : C.mist,
+                    fontFamily: FONT_BODY, fontSize: 11, fontWeight: active ? 500 : 400,
+                    letterSpacing: "0.08em", textTransform: "uppercase",
+                    cursor: "pointer",
+                    transition: "background 0.2s, color 0.2s, border-color 0.2s",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {cat}
+                </button>
+              );
+            })}
+          </div>
+        )}
 
-        {/* Product grid */}
+        {/* ── Loading skeletons ── */}
         {loading && (
           <div className="product-grid">
             {Array.from({ length: 8 }).map((_, i) => (
@@ -169,6 +193,7 @@ export default function MenuSection({ onAdd, wishlist, toggleWish, products, loa
           </div>
         )}
 
+        {/* ── Error state ── */}
         {!loading && error && (
           <div style={{ textAlign: "center", padding: "48px 0" }}>
             <p style={{ fontFamily: FONT_DISPLAY, fontSize: 24, fontWeight: 300, color: C.mist }}>
@@ -180,6 +205,7 @@ export default function MenuSection({ onAdd, wishlist, toggleWish, products, loa
           </div>
         )}
 
+        {/* ── No products at all ── */}
         {!loading && !error && products.length === 0 && (
           <div style={{ textAlign: "center", padding: "48px 0" }}>
             <p style={{ fontFamily: FONT_DISPLAY, fontSize: 24, fontWeight: 300, color: C.mist }}>
@@ -188,24 +214,47 @@ export default function MenuSection({ onAdd, wishlist, toggleWish, products, loa
           </div>
         )}
 
-        {!loading && !error && products.length > 0 && visible.length === 0 && (
+        {/* ── All products are featured (shown above) ── */}
+        {allFeatured && (
+          <div style={{ textAlign: "center", padding: "48px 0" }}>
+            <p style={{ fontFamily: FONT_DISPLAY, fontSize: 24, fontWeight: 300, color: C.mist }}>
+              All current products are featured above.
+            </p>
+            <p style={{ fontFamily: FONT_BODY, fontSize: 13, color: C.mist, marginTop: 8 }}>
+              Check back soon for more additions to the collection.
+            </p>
+          </div>
+        )}
+
+        {/* ── No search results ── */}
+        {!loading && !error && nonFeatured.length > 0 && visible.length === 0 && (
           <div style={{ textAlign: "center", padding: "48px 0", color: C.mist }}>
             <p style={{ fontFamily: FONT_DISPLAY, fontSize: 24, fontWeight: 300 }}>
               No results for &ldquo;{query}&rdquo;
             </p>
             <button
               onClick={clearAll}
-              style={{ marginTop: 16, background: "none", border: "none", cursor: "pointer", color: C.gold, fontFamily: FONT_BODY, fontSize: 13 }}
+              style={{
+                marginTop: 16, background: "none", border: "none",
+                cursor: "pointer", color: C.gold, fontFamily: FONT_BODY, fontSize: 13,
+              }}
             >
               Clear search
             </button>
           </div>
         )}
 
+        {/* ── Product grid ── */}
         {!loading && !error && visible.length > 0 && (
           <div className="product-grid">
             {visible.map((p) => (
-              <ProductCard key={p.id} product={p} onAdd={onAdd} wishlist={wishlist} toggleWish={toggleWish} />
+              <ProductCard
+                key={p.id}
+                product={p}
+                onAdd={onAdd}
+                wishlist={wishlist}
+                toggleWish={toggleWish}
+              />
             ))}
           </div>
         )}
