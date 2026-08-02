@@ -1,5 +1,6 @@
 // src/components/CollectionsSection.jsx
 import React, { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { C, FONT_DISPLAY, FONT_BODY } from "../constants/theme";
 import SectionHeader from "./shared/SectionHeader";
 import CollectionCard from "./shared/CollectionCard";
@@ -16,6 +17,8 @@ import CollectionCard from "./shared/CollectionCard";
    • Tagline: product count for that category.
 ═══════════════════════════════════════════════ */
 export default function CollectionsSection({ products, loading }) {
+  const navigate = useNavigate();
+
   /* ── Build one collection object per unique category ── */
   const collections = useMemo(() => {
     if (!products?.length) return [];
@@ -57,24 +60,11 @@ export default function CollectionsSection({ products, loading }) {
     }));
   }, [products]);
 
-  /* ── Click: scroll to #menu and apply category filter via hash param ── */
+  /* ── Click: navigate to the collection detail page ── */
   function handleCollectionClick(collection) {
-    // Encode the category into the URL hash so MenuSection can read it later
-    // (no router change — plain browser hash + custom event)
-    const encoded = encodeURIComponent(collection.id);
-    window.location.hash = `menu?category=${encoded}`;
-
-    const el = document.getElementById("menu");
-    if (el) {
-      const offset = 80; // navbar height
-      const top = el.getBoundingClientRect().top + window.scrollY - offset;
-      window.scrollTo({ top, behavior: "smooth" });
-    }
-
-    // Dispatch a custom event so MenuSection can react without routing
-    window.dispatchEvent(
-      new CustomEvent("selara:filter-category", { detail: collection.id })
-    );
+    const slug = encodeURIComponent(collection.id);
+    navigate(`/collection/${slug}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   /* ── Skeleton placeholders while products load ── */

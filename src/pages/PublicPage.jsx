@@ -86,9 +86,6 @@ export default function PublicPage() {
         <HeroSection settings={settings} />
         <TrustStrip />
 
-        {/* ── Shop by Category — CollectionCard grid ── */}
-        <CollectionsSection products={products} loading={loading} />
-
         {/* ── Featured picks ── */}
         <FeaturedSection
           onAdd={addToCart}
@@ -98,6 +95,9 @@ export default function PublicPage() {
           loading={loading}
           error={error}
         />
+
+        {/* ── Shop by Category — CollectionCard grid ── */}
+        <CollectionsSection products={products} loading={loading} />
 
         {/* ── Full menu (non-featured only) ── */}
         <MenuSection
