@@ -136,3 +136,65 @@ export function useSiteSettings() {
 
   return { settings, loaded };
 }
+
+/* ═══════════════════════════════════════════════
+   USE COLLECTION HOOK
+   Derives a single collection object from the
+   already-fetched products list, matched by slug
+   (which equals the URL-encoded category name).
+
+   Returns:
+     { collection, products, loading, error }
+
+   collection — null while loading or if not found
+   products   — all available products in this category
+                (same normalised shape as useProducts)
+   loading    — true until Firestore snapshot arrives
+   error      — Firestore error string or null
+
+   This is a pure derivation hook — it calls
+   useProducts() internally so the caller only needs
+   one import.  useProducts itself is memoised by
+   onSnapshot, so a second call on the same page
+   reuses the same live listener.
+═══════════════════════════════════════════════ */
+export function useCollection(slug) {
+  const { products, loading, error } = useProducts();
+
+  const categoryName = slug ? decodeURIComponent(slug) : "";
+
+  // Filter to this category's products (case-insensitive match)
+  const categoryProducts = products.filter(
+    (p) => p.category?.trim().toLowerCase() === categoryName.trim().toLowerCase()
+  );
+
+  // Resolve cover image: first real image found across category products
+  const coverImage = categoryProducts
+    .map(
+      (p) =>
+        p.mainImage ||
+        (Array.isArray(p.images) && p.images[0]) ||
+        p.imageUrl ||
+        p.img ||
+        ""
+    )
+    .find(Boolean) ?? "";
+
+  // Only materialise the collection once products have loaded
+  const collection =
+    loading || !categoryName
+      ? null
+      : categoryProducts.length > 0
+      ? {
+          name:     categoryProducts[0].category.trim(),
+          slug:     encodeURIComponent(categoryProducts[0].category.trim()),
+          tagline:  `${categoryProducts.length} ${
+            categoryProducts.length === 1 ? "piece" : "pieces"
+          } in this collection`,
+          imageUrl: coverImage,
+          count:    categoryProducts.length,
+        }
+      : null; // category exists in slug but no products → treated as 404
+
+  return { collection, products: categoryProducts, loading, error };
+}
