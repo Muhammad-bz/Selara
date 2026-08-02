@@ -3,7 +3,7 @@ import React, { useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 
-import { useCollection, useSiteSettings, useReveal } from "../hooks";
+import { useCollection, useAllCollections, useSiteSettings, useReveal } from "../hooks";
 import { useCart } from "../context/CartContext";
 import { C, FONT_DISPLAY, FONT_BODY } from "../constants/theme";
 
@@ -41,6 +41,7 @@ export default function CollectionPage() {
 
   /* ── Data ── */
   const { collection, products, loading, error } = useCollection(slug);
+  const { collections: allCollections } = useAllCollections();
   const { settings } = useSiteSettings();
   useReveal();
 
@@ -306,6 +307,15 @@ export default function CollectionPage() {
         </div>
       </div>
 
+      {/* ══ COLLECTION SWITCHER ══════════════════════ */}
+      {allCollections.length > 1 && (
+        <CollectionSwitcher
+          collections={allCollections}
+          currentSlug={slug}
+          navigate={navigate}
+        />
+      )}
+
       {/* ══ PRODUCT GRID ═════════════════════════════ */}
       <section style={{ background: C.cream, padding: "64px 24px 96px" }}>
         <div style={{ maxWidth: 1260, margin: "0 auto" }}>
@@ -364,6 +374,90 @@ export default function CollectionPage() {
         </div>
       </section>
     </>
+  );
+}
+
+/* ── Collection Switcher ── */
+function CollectionSwitcher({ collections, currentSlug, navigate }) {
+  const currentName = currentSlug ? decodeURIComponent(currentSlug) : "";
+
+  return (
+    <div style={{
+      background: C.creamDeep,
+      borderBottom: `1px solid rgba(201,129,143,0.15)`,
+    }}>
+      <div style={{
+        maxWidth: 1260,
+        margin: "0 auto",
+        padding: "0 24px",
+        overflowX: "auto",
+        /* Hide scrollbar cross-browser */
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
+      }}>
+        <nav
+          aria-label="Switch collection"
+          style={{
+            display: "flex",
+            alignItems: "stretch",
+            gap: 0,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {collections.map((col) => {
+            const isActive =
+              col.name.toLowerCase() === currentName.toLowerCase();
+            return (
+              <button
+                key={col.slug}
+                onClick={() => {
+                  if (!isActive) {
+                    navigate(`/collection/${col.slug}`);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }
+                }}
+                aria-current={isActive ? "page" : undefined}
+                style={{
+                  position: "relative",
+                  background: "none",
+                  border: "none",
+                  padding: "14px 20px",
+                  cursor: isActive ? "default" : "pointer",
+                  fontFamily: FONT_BODY,
+                  fontSize: 10,
+                  fontWeight: isActive ? 600 : 400,
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  color: isActive ? C.rose : C.mist,
+                  transition: "color 0.18s",
+                  flexShrink: 0,
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) e.currentTarget.style.color = C.charcoal;
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) e.currentTarget.style.color = C.mist;
+                }}
+              >
+                {col.name}
+                {/* Active underline */}
+                {isActive && (
+                  <span style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 20,
+                    right: 20,
+                    height: 1.5,
+                    background: C.rose,
+                    borderRadius: 1,
+                  }} />
+                )}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+    </div>
   );
 }
 

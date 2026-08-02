@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { collection, getDocs, getDoc, onSnapshot, query, where, doc } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { fallbackImg, SITE_DEFAULTS } from "../constants/theme";
@@ -197,4 +197,62 @@ export function useCollection(slug) {
       : null; // category exists in slug but no products → treated as 404
 
   return { collection, products: categoryProducts, loading, error };
+}
+
+/* ═══════════════════════════════════════════════
+   USE ALL COLLECTIONS HOOK
+   Derives every collection from the shared products
+   listener — no extra Firestore fetch.
+
+   Returns:
+     { collections, loading, error }
+
+   collections — array of { name, slug, imageUrl, count }
+                 sorted by name, deduplicated by category
+═══════════════════════════════════════════════ */
+export function useAllCollections() {
+  const { products, loading, error } = useProducts();
+
+  const collections = React.useMemo(() => {
+    if (!products?.length) return [];
+
+    const map = new Map();
+
+    products.forEach((p) => {
+      const cat = p.category?.trim();
+      if (!cat) return;
+
+      if (!map.has(cat)) {
+        const img =
+          p.mainImage ||
+          (Array.isArray(p.images) && p.images[0]) ||
+          p.imageUrl ||
+          p.img ||
+          "";
+        map.set(cat, { imageUrl: img, count: 1 });
+      } else {
+        const entry = map.get(cat);
+        entry.count += 1;
+        if (!entry.imageUrl) {
+          entry.imageUrl =
+            p.mainImage ||
+            (Array.isArray(p.images) && p.images[0]) ||
+            p.imageUrl ||
+            p.img ||
+            "";
+        }
+      }
+    });
+
+    return Array.from(map.entries())
+      .map(([name, { imageUrl, count }]) => ({
+        name,
+        slug: encodeURIComponent(name),
+        imageUrl,
+        count,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [products]);
+
+  return { collections, loading, error };
 }
