@@ -12,7 +12,8 @@ import OrderSuccess from "./OrderSuccess";
 ═══════════════════════════════════════════════ */
 export default function CartDrawer({ open, onClose, cart, updateQty, removeItem, onOrderSuccess, settings = {} }) {
   // "cart" | "checkout" | "success"
-  const [step, setStep] = useState("cart");
+  const [step,          setStep]          = useState("cart");
+  const [paymentMethod, setPaymentMethod] = useState("");
 
   const total = useMemo(
     () => cart.reduce((s, i) => s + i.price * i.qty, 0),
@@ -21,7 +22,7 @@ export default function CartDrawer({ open, onClose, cart, updateQty, removeItem,
 
   // Reset to cart step when drawer closes
   useEffect(() => {
-    if (!open) setStep("cart");
+    if (!open) { setStep("cart"); setPaymentMethod(""); }
   }, [open]);
 
   useEffect(() => {
@@ -31,7 +32,8 @@ export default function CartDrawer({ open, onClose, cart, updateQty, removeItem,
 
   if (!open) return null;
 
-  const handleSuccess = () => {
+  const handleSuccess = ({ paymentMethod: method } = {}) => {
+    setPaymentMethod(method ?? "");
     setStep("success");
     onOrderSuccess?.();
   };
@@ -52,7 +54,7 @@ export default function CartDrawer({ open, onClose, cart, updateQty, removeItem,
 
         {/* ── Step: success ── */}
         {step === "success" && (
-          <OrderSuccess onClose={onClose} />
+          <OrderSuccess onClose={onClose} paymentMethod={paymentMethod} />
         )}
 
         {/* ── Step: checkout form ── */}
