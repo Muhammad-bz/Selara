@@ -132,6 +132,11 @@ export default function CartDrawer({ open, onClose, cart, updateQty, removeItem,
                       <p style={{ fontFamily: FONT_BODY, fontSize: 12, color: C.gold, fontWeight: 500 }}>
                         {fmt(item.price)}
                       </p>
+                      {item.selectedSize && (
+                        <p style={{ fontFamily: FONT_BODY, fontSize: 11, color: C.mist, marginTop: 2, lineHeight: 1.4 }}>
+                          Size: <span style={{ fontWeight: 600, color: C.espresso }}>{item.selectedSize}</span>
+                        </p>
+                      )}
                       {Array.isArray(item.selectedAddons) && item.selectedAddons.length > 0 && (
                         <p style={{ fontFamily: FONT_BODY, fontSize: 11, color: C.mist, marginTop: 2, lineHeight: 1.4 }}>
                           + {item.selectedAddons.map((a) => a.name ?? a.title).filter(Boolean).join(", ")}

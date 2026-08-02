@@ -73,7 +73,8 @@ const DEFAULTS = {
   facebook:      "",
   tiktok:        "",
   youtube:       "",
-
+  /* Sizing */
+  sizeChartUrl:  "",
 };
 
 function settingsEqual(a, b) {
@@ -768,6 +769,18 @@ export default function Settings() {
           </Field>
         </div>
       </SectionCard>
+
+          {/* ── 4. Size Chart ── */}
+          <SectionCard icon={Layers} title="Size Chart" subtitle="Shown to customers on every product page" delay={0.12}>
+            <div className="set-grid">
+              <ImageUpload
+                label="Size Chart Image"
+                value={values.sizeChartUrl}
+                onChange={imageField("sizeChartUrl")}
+                hint="Upload your size guide image — the same image appears on all products"
+              />
+            </div>
+          </SectionCard>
 
         </div>
       </div>

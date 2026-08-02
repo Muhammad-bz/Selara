@@ -420,6 +420,7 @@ export default function ProductPage() {
   const [added,          setAdded]          = useState(false);
   const [sizeError,      setSizeError]      = useState(false);
   const [selectedAddons, setSelectedAddons] = useState(new Set());
+  const [sizeChartOpen,  setSizeChartOpen]  = useState(false);
 
   useEffect(() => {
     setSelectedSize(null); setQty(1); setAdded(false); setSizeError(false); setSelectedAddons(new Set());
@@ -692,39 +693,137 @@ export default function ProductPage() {
             {/* Sizes */}
             {hasSizes && (
               <div style={{ marginBottom: 28 }}>
-                <p style={{
-                  fontFamily: FONT_BODY, fontSize: 9, fontWeight: 500,
-                  letterSpacing: "0.18em", textTransform: "uppercase",
-                  color: C.charcoal, marginBottom: 12,
-                }}>
-                  Size{selectedSize && <span style={{ color: C.rose, fontWeight: 400 }}> — {selectedSize}</span>}
-                </p>
+                {/* Label row */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                  <p style={{
+                    fontFamily: FONT_BODY, fontSize: 9, fontWeight: 500,
+                    letterSpacing: "0.18em", textTransform: "uppercase",
+                    color: C.charcoal, margin: 0,
+                  }}>
+                    Size{selectedSize && <span style={{ color: C.rose, fontWeight: 400 }}> — {selectedSize}</span>}
+                  </p>
+                  {settings?.sizeChartUrl && (
+                    <button
+                      onClick={() => setSizeChartOpen(true)}
+                      style={{
+                        background: "none", border: "none", cursor: "pointer",
+                        fontFamily: FONT_BODY, fontSize: 10, fontWeight: 500,
+                        letterSpacing: "0.12em", textTransform: "uppercase",
+                        color: C.mist, textDecoration: "underline",
+                        padding: 0, transition: "color 0.15s",
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = C.rose; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = C.mist; }}
+                    >
+                      Size Chart
+                    </button>
+                  )}
+                </div>
+
+                {/* Size chips */}
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {(product.sizes || SIZES).map((sz) => {
-                    const isActive = selectedSize === sz;
+                  {product.sizes.map((sz) => {
+                    // Support both string (legacy) and {label, available} objects
+                    const label     = typeof sz === "string" ? sz : sz.label;
+                    const available = typeof sz === "string" ? true : sz.available !== false;
+                    const isActive  = selectedSize === label;
                     return (
-                      <button key={sz}
-                        onClick={() => { setSelectedSize(sz); setSizeError(false); }}
+                      <button
+                        key={label}
+                        onClick={() => { if (!available) return; setSelectedSize(label); setSizeError(false); }}
+                        disabled={!available}
+                        title={!available ? "Out of stock" : undefined}
                         style={{
                           width: 48, height: 48,
-                          border: `1px solid ${isActive ? C.rose : C.line}`,
-                          background: isActive ? C.rose : "transparent",
-                          color: isActive ? "#fff" : C.mist,
+                          border: `1px solid ${isActive ? C.rose : available ? C.line : "rgba(0,0,0,0.08)"}`,
+                          background: isActive ? C.rose : available ? "transparent" : "rgba(0,0,0,0.03)",
+                          color: isActive ? "#fff" : available ? C.mist : "rgba(0,0,0,0.25)",
                           fontFamily: FONT_BODY, fontSize: 12, fontWeight: 400,
-                          letterSpacing: "0.06em", cursor: "pointer",
+                          letterSpacing: "0.06em",
+                          cursor: available ? "pointer" : "not-allowed",
+                          position: "relative", overflow: "hidden",
                           transition: "background 0.18s, color 0.18s, border-color 0.18s",
                         }}
                       >
-                        {sz}
+                        {label}
+                        {/* Diagonal slash for unavailable */}
+                        {!available && (
+                          <span style={{
+                            position: "absolute", inset: 0,
+                            background: "linear-gradient(to top right, transparent calc(50% - 0.5px), rgba(0,0,0,0.18) calc(50% - 0.5px), rgba(0,0,0,0.18) calc(50% + 0.5px), transparent calc(50% + 0.5px))",
+                            pointerEvents: "none",
+                          }} />
+                        )}
                       </button>
                     );
                   })}
                 </div>
+
                 {sizeError && (
                   <p style={{ fontFamily: FONT_BODY, fontSize: 12, color: "#c0392b", marginTop: 8 }}>
                     Please select a size.
                   </p>
                 )}
+              </div>
+            )}
+
+            {/* Size Chart Modal */}
+            {sizeChartOpen && settings?.sizeChartUrl && (
+              <div
+                onClick={() => setSizeChartOpen(false)}
+                style={{
+                  position: "fixed", inset: 0, zIndex: 9100,
+                  background: "rgba(10,8,6,0.88)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  padding: 20, animation: "fadeIn 0.2s ease",
+                }}
+              >
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    position: "relative",
+                    maxWidth: "min(94vw, 700px)",
+                    maxHeight: "90vh",
+                    background: C.cream,
+                    display: "flex", flexDirection: "column",
+                    overflow: "hidden",
+                  }}
+                >
+                  {/* Modal header */}
+                  <div style={{
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    padding: "14px 18px",
+                    borderBottom: `1px solid ${C.line}`,
+                    flexShrink: 0,
+                  }}>
+                    <p style={{
+                      fontFamily: FONT_BODY, fontSize: 9, fontWeight: 500,
+                      letterSpacing: "0.2em", textTransform: "uppercase",
+                      color: C.charcoal, margin: 0,
+                    }}>
+                      Size Chart
+                    </p>
+                    <button
+                      onClick={() => setSizeChartOpen(false)}
+                      aria-label="Close size chart"
+                      style={{
+                        background: "none", border: "none", cursor: "pointer",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        color: C.mist, padding: 4,
+                      }}
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                  {/* Image */}
+                  <div style={{ overflowY: "auto", flex: 1 }}>
+                    <img
+                      src={settings.sizeChartUrl}
+                      alt="Size chart"
+                      style={{ width: "100%", display: "block" }}
+                    />
+                  </div>
+                </div>
               </div>
             )}
 

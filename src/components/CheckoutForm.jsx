@@ -45,6 +45,7 @@ export default function CheckoutForm({ cart, total, onBack, onSuccess, settings 
   qty:            i.qty,
   subtotal:       i.price * i.qty,
   img:            i.img ?? "",
+  selectedSize:   i.selectedSize ?? null,
   selectedAddons: Array.isArray(i.selectedAddons) ? i.selectedAddons : [],
 }));
 
@@ -98,7 +99,12 @@ export default function CheckoutForm({ cart, total, onBack, onSuccess, settings 
           <p style={{ fontFamily: FONT_BODY, fontSize: 12, color: C.mist, marginBottom: 4 }}>
             {cart.reduce((s, i) => s + i.qty, 0)} item{cart.reduce((s, i) => s + i.qty, 0) !== 1 ? "s" : ""}
           </p>
-          <p style={{ fontFamily: FONT_DISPLAY, fontSize: 20, fontWeight: 500, color: C.espresso }}>
+          {cart.map((item, idx) => item.selectedSize ? (
+            <p key={idx} style={{ fontFamily: FONT_BODY, fontSize: 11, color: C.mist, marginBottom: 2 }}>
+              {item.name} — Size <span style={{ fontWeight: 600, color: C.espresso }}>{item.selectedSize}</span>
+            </p>
+          ) : null)}
+          <p style={{ fontFamily: FONT_DISPLAY, fontSize: 20, fontWeight: 500, color: C.espresso, marginTop: 6 }}>
             Total: {fmt(total)}
           </p>
         </div>

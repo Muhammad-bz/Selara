@@ -130,10 +130,13 @@ function useOrders() {
           const itemNames = rawItems.map((i) => {
             if (typeof i === "string") return i;
             const base   = `${i.name}${i.qty > 1 ? ` \u00d7${i.qty}` : ""}`;
+            const sizePart = i.selectedSize ? ` [${i.selectedSize}]` : "";
             const addons = Array.isArray(i.selectedAddons) && i.selectedAddons.length > 0
               ? i.selectedAddons.map((a) => a?.name).filter(Boolean)
               : [];
-            return addons.length > 0 ? `${base} (+${addons.join(", ")})` : base;
+            return addons.length > 0
+              ? `${base}${sizePart} (+${addons.join(", ")})`
+              : `${base}${sizePart}`;
           });
 
           return {
@@ -806,10 +809,11 @@ function OrderModal({ order, onClose }) {
       : [];
 
     return {
-      name: item.name ?? item.title ?? "Item",
+      name:         item.name ?? item.title ?? "Item",
       qty,
       price,
       addons,
+      selectedSize: item.selectedSize ?? null,
     };
   });
 }, [order.rawItems, order.items]);
@@ -948,7 +952,26 @@ function OrderModal({ order, onClose }) {
                     <React.Fragment key={i}>
                       {/* Main product row */}
                       <tr>
-                        <td style={{ fontWeight: 500 }}>{item.name}</td>
+                        <td style={{ fontWeight: 500 }}>
+                          {item.name}
+                          {item.selectedSize && (
+                            <span style={{
+                              display: "inline-block",
+                              marginLeft: 8,
+                              fontSize: 10.5,
+                              fontWeight: 600,
+                              letterSpacing: "0.06em",
+                              color: C.chocolate,
+                              background: "rgba(201,129,143,0.10)",
+                              border: `1px solid rgba(201,129,143,0.28)`,
+                              padding: "1px 7px",
+                              borderRadius: 4,
+                              fontStyle: "normal",
+                            }}>
+                              {item.selectedSize}
+                            </span>
+                          )}
+                        </td>
                         <td style={{ textAlign: "center", color: C.mist }}>×{item.qty}</td>
                         <td>
                           {item.price != null

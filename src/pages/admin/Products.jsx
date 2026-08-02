@@ -123,6 +123,11 @@ const db = getFirestore(app);
 /* ─────────────────────────────────────────────────
    EMPTY FORM  (single source of truth for the modal)
 ───────────────────────────────────────────────── */
+const ALL_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
+
+// sizes is stored as array of { label, available }
+const DEFAULT_SIZES = ALL_SIZES.map((label) => ({ label, available: true }));
+
 const EMPTY_FORM = {
   name:        "",
   category:    "",
@@ -134,6 +139,7 @@ const EMPTY_FORM = {
   images:      [],
   mainImage:   "",
   addons:      [],
+  sizes:       [],   // [] means "no sizes" (product has no size selector)
 };
 
 /* ═══════════════════════════════════════════════
@@ -195,6 +201,7 @@ function useProducts() {
       images:      data.images ?? [],
       mainImage:   data.mainImage ?? "",
       addons:      data.addons ?? [],
+      sizes:       data.sizes ?? [],
       createdAt:   serverTimestamp(),
     });
   }, []);
@@ -211,6 +218,7 @@ function useProducts() {
       images:      data.images ?? [],
       mainImage:   data.mainImage ?? "",
       addons:      data.addons ?? [],
+      sizes:       data.sizes ?? [],
     });
   }, []);
 
@@ -756,6 +764,38 @@ function ProductsStyles() {
       }
       .crm-addon-del:hover { color: ${C.red}; background: ${C.redBg}; }
 
+      /* Size chips in product form */
+      .crm-size-grid {
+        display: flex; flex-wrap: wrap; gap: 8px;
+        margin-top: 4px;
+      }
+      .crm-size-chip {
+        display: flex; flex-direction: column; align-items: center;
+        gap: 4px; cursor: default;
+      }
+      .crm-size-label {
+        width: 48px; height: 40px;
+        border: 1.5px solid ${C.lineStrong};
+        border-radius: 4px;
+        font-family: ${FONT_BODY}; font-size: 12px; font-weight: 500;
+        color: ${C.espresso};
+        background: #fff;
+        display: flex; align-items: center; justify-content: center;
+        transition: border-color 0.15s, background 0.15s, color 0.15s;
+      }
+      .crm-size-chip.unavailable .crm-size-label {
+        color: ${C.mist}; background: ${C.creamDeep};
+        text-decoration: line-through; border-color: ${C.line};
+      }
+      .crm-size-toggle {
+        font-family: ${FONT_BODY}; font-size: 9px; font-weight: 600;
+        letter-spacing: 0.06em; text-transform: uppercase;
+        color: ${C.mist}; background: none; border: none;
+        cursor: pointer; padding: 0; transition: color 0.15s;
+      }
+      .crm-size-chip.unavailable .crm-size-toggle { color: ${C.red}; }
+      .crm-size-chip.available .crm-size-toggle { color: ${C.green}; }
+
       /* Reduced motion */
       @media (prefers-reduced-motion: reduce) {
         .crm-page, .crm-table tbody tr, .crm-card,
@@ -985,6 +1025,11 @@ function ProductModal({ mode, initial, categories, onSave, onClose }) {
       base.mainImage = base.images[0];
     }
     if (!Array.isArray(base.addons)) base.addons = [];
+    // Normalise sizes: accept legacy string[] or new {label,available}[]
+    if (!Array.isArray(base.sizes)) base.sizes = [];
+    base.sizes = base.sizes.map((s) =>
+      typeof s === "string" ? { label: s, available: true } : s
+    );
     return base;
   };
 
@@ -1257,6 +1302,64 @@ function ProductModal({ mode, initial, categories, onSave, onClose }) {
                   No images — add some above
                 </span>
               </div>
+            )}
+          </div>
+
+          {/* ── Sizes ── */}
+          <div className="crm-field">
+            <label className="crm-label" style={{ marginBottom: 10 }}>
+              Sizes
+              <span style={{ fontWeight: 400, color: C.mist, textTransform: "none", letterSpacing: 0, marginLeft: 6 }}>
+                (leave empty if this product has no size options)
+              </span>
+            </label>
+
+            {/* Enable / disable size selector */}
+            {form.sizes.length === 0 ? (
+              <button
+                type="button"
+                className="crm-upload-btn"
+                disabled={saving || uploading}
+                onClick={() => setForm((f) => ({ ...f, sizes: DEFAULT_SIZES.map((s) => ({ ...s })) }))}
+              >
+                <Plus size={13} /> Enable Sizes
+              </button>
+            ) : (
+              <>
+                <div className="crm-size-grid">
+                  {form.sizes.map((sz, idx) => (
+                    <div
+                      key={sz.label}
+                      className={`crm-size-chip ${sz.available ? "available" : "unavailable"}`}
+                    >
+                      <div className="crm-size-label">{sz.label}</div>
+                      <button
+                        type="button"
+                        className="crm-size-toggle"
+                        disabled={saving || uploading}
+                        onClick={() =>
+                          setForm((f) => {
+                            const next = [...f.sizes];
+                            next[idx] = { ...next[idx], available: !next[idx].available };
+                            return { ...f, sizes: next };
+                          })
+                        }
+                      >
+                        {sz.available ? "In stock" : "Out"}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  className="crm-upload-btn"
+                  style={{ marginTop: 10 }}
+                  disabled={saving || uploading}
+                  onClick={() => setForm((f) => ({ ...f, sizes: [] }))}
+                >
+                  <X size={13} /> Remove Sizes
+                </button>
+              </>
             )}
           </div>
 
