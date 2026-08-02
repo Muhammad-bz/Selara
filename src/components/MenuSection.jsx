@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useRef } from "react";
+import React, { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { X } from "lucide-react";
 import { C, FONT_DISPLAY, FONT_BODY } from "../constants/theme";
 import SectionHeader from "./shared/SectionHeader";
@@ -9,9 +9,9 @@ import ProductCard from "./shared/ProductCard";
    • Featured products are shown in FeaturedSection above —
      this section displays only non-featured products so
      nothing is duplicated on the main screen.
-   • All products are still reachable via category filter
-     and search (featured badge is shown on the card when
-     browsing by category).
+   • Listens for "selara:filter-category" custom events
+     dispatched by CollectionsSection so clicking a
+     CollectionCard auto-filters this grid.
    PERF: visible list is memoised — only recalculates
          when filter/sort state actually changes.
 ═══════════════════════════════════════════════ */
@@ -20,6 +20,16 @@ export default function MenuSection({ onAdd, wishlist, toggleWish, products, loa
   const [query,          setQuery]          = useState("");
   const [sort,           setSort]           = useState("default");
   const scrollRef = useRef(null);
+
+  /* ── Listen for category selection from CollectionsSection ── */
+  useEffect(() => {
+    function onFilterCategory(e) {
+      setActiveCategory(e.detail ?? "All");
+      setQuery("");
+    }
+    window.addEventListener("selara:filter-category", onFilterCategory);
+    return () => window.removeEventListener("selara:filter-category", onFilterCategory);
+  }, []);
 
   /* ── Non-featured products only ─────────────────
      Featured ones already appear in FeaturedSection.

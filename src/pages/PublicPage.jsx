@@ -13,12 +13,12 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 // Section components
-import HeroSection from "../components/HeroSection";
-import TrustStrip from "../components/TrustStrip";
-import FeaturedSection from "../components/FeaturedSection";
-import MenuSection from "../components/MenuSection";
-import AboutSection from "../components/AboutSection";
-import ContactSection from "../components/ContactSection";
+import HeroSection        from "../components/HeroSection";
+import TrustStrip         from "../components/TrustStrip";
+import CollectionsSection from "../components/CollectionsSection";   // ← NEW
+import FeaturedSection    from "../components/FeaturedSection";
+import MenuSection        from "../components/MenuSection";
+import AboutSection       from "../components/AboutSection";
 
 // Cart & checkout
 import CartDrawer from "../components/CartDrawer";
@@ -70,7 +70,7 @@ export default function PublicPage() {
   const closeCart = useCallback(() => setCartOpen(false), []);
   const clearCart = useCallback(() => setCart([]), []);
 
-return (
+  return (
     <>
       <SiteHead settings={settings} />
       <GlobalStyles />
@@ -85,8 +85,30 @@ return (
       <main>
         <HeroSection settings={settings} />
         <TrustStrip />
-        <FeaturedSection onAdd={addToCart} wishlist={wishlist} toggleWish={toggleWish} products={products} loading={loading} error={error} />
-        <MenuSection     onAdd={addToCart} wishlist={wishlist} toggleWish={toggleWish} products={products} loading={loading} error={error} />
+
+        {/* ── Shop by Category — CollectionCard grid ── */}
+        <CollectionsSection products={products} loading={loading} />
+
+        {/* ── Featured picks ── */}
+        <FeaturedSection
+          onAdd={addToCart}
+          wishlist={wishlist}
+          toggleWish={toggleWish}
+          products={products}
+          loading={loading}
+          error={error}
+        />
+
+        {/* ── Full menu (non-featured only) ── */}
+        <MenuSection
+          onAdd={addToCart}
+          wishlist={wishlist}
+          toggleWish={toggleWish}
+          products={products}
+          loading={loading}
+          error={error}
+        />
+
         <AboutSection settings={settings} />
       </main>
 
