@@ -138,6 +138,30 @@ export function useSiteSettings() {
 }
 
 /* ═══════════════════════════════════════════════
+   CATEGORY META  —  reads imageUrl + tagline from
+   the same localStorage key that the admin Categories
+   panel writes to (cremeo_categories).
+   Returns a Map of name → { imageUrl, tagline }.
+═══════════════════════════════════════════════ */
+const CAT_LS_KEY = "cremeo_categories";
+
+function loadCategoryMeta() {
+  try {
+    const raw = localStorage.getItem(CAT_LS_KEY);
+    if (!raw) return new Map();
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return new Map();
+    const map = new Map();
+    parsed.forEach((c) => {
+      if (c.name) map.set(c.name.trim(), { imageUrl: c.imageUrl ?? "", tagline: c.tagline ?? "" });
+    });
+    return map;
+  } catch (_) {
+    return new Map();
+  }
+}
+
+/* ═══════════════════════════════════════════════
    USE COLLECTION HOOK
    Derives a single collection object from the
    already-fetched products list, matched by slug
@@ -152,11 +176,8 @@ export function useSiteSettings() {
    loading    — true until Firestore snapshot arrives
    error      — Firestore error string or null
 
-   This is a pure derivation hook — it calls
-   useProducts() internally so the caller only needs
-   one import.  useProducts itself is memoised by
-   onSnapshot, so a second call on the same page
-   reuses the same live listener.
+   Admin-set imageUrl and tagline (from localStorage)
+   take priority over product-derived fallbacks.
 ═══════════════════════════════════════════════ */
 export function useCollection(slug) {
   const { products, loading, error } = useProducts();
@@ -185,15 +206,19 @@ export function useCollection(slug) {
     loading || !categoryName
       ? null
       : categoryProducts.length > 0
-      ? {
-          name:     categoryProducts[0].category.trim(),
-          slug:     encodeURIComponent(categoryProducts[0].category.trim()),
-          tagline:  `${categoryProducts.length} ${
-            categoryProducts.length === 1 ? "piece" : "pieces"
-          } in this collection`,
-          imageUrl: coverImage,
-          count:    categoryProducts.length,
-        }
+      ? (() => {
+          const name = categoryProducts[0].category.trim();
+          const meta = loadCategoryMeta().get(name) ?? {};
+          return {
+            name,
+            slug:     encodeURIComponent(name),
+            imageUrl: meta.imageUrl || coverImage,
+            tagline:  meta.tagline  || `${categoryProducts.length} ${
+              categoryProducts.length === 1 ? "piece" : "pieces"
+            } in this collection`,
+            count:    categoryProducts.length,
+          };
+        })()
       : null; // category exists in slug but no products → treated as 404
 
   return { collection, products: categoryProducts, loading, error };
@@ -207,8 +232,9 @@ export function useCollection(slug) {
    Returns:
      { collections, loading, error }
 
-   collections — array of { name, slug, imageUrl, count }
-                 sorted by name, deduplicated by category
+   collections — array of { name, slug, imageUrl, tagline, count }
+                 sorted by name, deduplicated by category.
+   Admin-set imageUrl and tagline take priority.
 ═══════════════════════════════════════════════ */
 export function useAllCollections() {
   const { products, loading, error } = useProducts();
@@ -216,6 +242,7 @@ export function useAllCollections() {
   const collections = React.useMemo(() => {
     if (!products?.length) return [];
 
+    const catMeta = loadCategoryMeta();
     const map = new Map();
 
     products.forEach((p) => {
@@ -245,12 +272,16 @@ export function useAllCollections() {
     });
 
     return Array.from(map.entries())
-      .map(([name, { imageUrl, count }]) => ({
-        name,
-        slug: encodeURIComponent(name),
-        imageUrl,
-        count,
-      }))
+      .map(([name, { imageUrl, count }]) => {
+        const meta = catMeta.get(name) ?? {};
+        return {
+          name,
+          slug:     encodeURIComponent(name),
+          imageUrl: meta.imageUrl || imageUrl,
+          tagline:  meta.tagline  || `${count} ${count === 1 ? "piece" : "pieces"}`,
+          count,
+        };
+      })
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [products]);
 

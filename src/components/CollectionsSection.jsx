@@ -10,12 +10,34 @@ import CollectionCard from "./shared/CollectionCard";
    Derives one CollectionCard per unique product category
    from the live products array passed down from PublicPage.
 
-   • No extra Firestore fetch — reuses the products already loaded.
-   • Clicking a card scrolls to #menu and filters by that category
-     via ?category= in the URL hash (no routing change needed).
-   • Image: first product image found in that category.
-   • Tagline: product count for that category.
+   Category imageUrl and tagline are overlaid from
+   localStorage (cremeo_categories) when present —
+   the same store the admin Categories panel writes to.
 ═══════════════════════════════════════════════ */
+
+const CAT_LS_KEY = "cremeo_categories";
+
+/** Returns a Map of category name → { imageUrl, tagline } from localStorage. */
+function loadCategoryMeta() {
+  try {
+    const raw = localStorage.getItem(CAT_LS_KEY);
+    if (!raw) return new Map();
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return new Map();
+    const map = new Map();
+    parsed.forEach((c) => {
+      if (c.name) {
+        map.set(c.name.trim(), {
+          imageUrl: c.imageUrl ?? "",
+          tagline:  c.tagline  ?? "",
+        });
+      }
+    });
+    return map;
+  } catch (_) {
+    return new Map();
+  }
+}
 export default function CollectionsSection({ products, loading }) {
   const navigate = useNavigate();
 
@@ -23,6 +45,7 @@ export default function CollectionsSection({ products, loading }) {
   const collections = useMemo(() => {
     if (!products?.length) return [];
 
+    const catMeta = loadCategoryMeta(); // imageUrl + tagline from admin
     const map = new Map(); // category name → { imageUrl, count }
 
     products.forEach((p) => {
@@ -40,7 +63,6 @@ export default function CollectionsSection({ products, loading }) {
       } else {
         const entry = map.get(cat);
         entry.count += 1;
-        // Upgrade to a real image if the first product had none
         if (!entry.imageUrl) {
           entry.imageUrl =
             p.mainImage ||
@@ -52,12 +74,17 @@ export default function CollectionsSection({ products, loading }) {
       }
     });
 
-    return Array.from(map.entries()).map(([name, { imageUrl, count }]) => ({
-      id:       name,                   // used as the key + filter value
-      name,
-      tagline:  `${count} ${count === 1 ? "piece" : "pieces"}`,
-      imageUrl,
-    }));
+    return Array.from(map.entries()).map(([name, { imageUrl, count }]) => {
+      const meta = catMeta.get(name) ?? {};
+      return {
+        id:      name,
+        name,
+        // Admin-set imageUrl wins; fall back to first product image
+        imageUrl: meta.imageUrl || imageUrl,
+        // Admin-set tagline wins; fall back to product count
+        tagline:  meta.tagline  || `${count} ${count === 1 ? "piece" : "pieces"}`,
+      };
+    });
   }, [products]);
 
   /* ── Click: navigate to the collection detail page ── */
