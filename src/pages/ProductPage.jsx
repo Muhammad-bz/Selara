@@ -853,9 +853,9 @@ export default function ProductPage() {
             </div>
 
             {/* CTAs */}
-            <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 24 }}>
+            <div style={{ marginBottom: 24 }}>
               <button onClick={handleAdd} style={{
-                flex: 1, background: added ? C.rose : C.charcoal,
+                width: "100%", background: added ? C.rose : C.charcoal,
                 color: "#fff", border: "none",
                 padding: "15px 24px",
                 fontFamily: FONT_BODY, fontSize: 11, fontWeight: 500,
@@ -868,27 +868,7 @@ export default function ProductPage() {
               >
                 {added ? <><Check size={14} /> Added to cart</> : "Add to cart"}
               </button>
-
-              <button onClick={() => toggleWish(product.id)}
-                aria-label={wished ? "Remove from wishlist" : "Save to wishlist"}
-                style={{
-                  width: 52, height: 52, flexShrink: 0,
-                  border: `1px solid ${wished ? C.rose : C.line}`,
-                  background: "transparent",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  cursor: "pointer", transition: "border-color 0.2s",
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.borderColor = C.rose; }}
-                onMouseLeave={(e) => { e.currentTarget.style.borderColor = wished ? C.rose : C.line; }}
-              >
-                <Heart size={18} fill={wished ? C.rose : "none"} color={wished ? C.rose : C.mist} />
-              </button>
             </div>
-
-            <div style={{ height: 1, background: C.line, marginBottom: 18 }} />
-            <p style={{ fontFamily: FONT_BODY, fontSize: 11, color: C.mist, letterSpacing: "0.04em", lineHeight: 1.7 }}>
-              Free delivery on orders over PKR 3,000 · Easy 7-day returns
-            </p>
           </div>
         </div>
 
