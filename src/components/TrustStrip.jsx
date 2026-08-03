@@ -23,6 +23,7 @@ const TrustStrip = memo(function TrustStrip() {
             style={{
               display: "flex", alignItems: "center", justifyContent: "center",
               gap: 8, padding: "10px 12px", color: C.rose,
+              textAlign: "center",
             }}
           >
             {it.icon}

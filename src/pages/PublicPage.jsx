@@ -19,6 +19,7 @@ import CollectionsSection from "../components/CollectionsSection";   // ← NEW
 import FeaturedSection    from "../components/FeaturedSection";
 import MenuSection        from "../components/MenuSection";
 import AboutSection       from "../components/AboutSection";
+import ContactSection     from "../components/ContactSection";
 
 // Cart & checkout
 import CartDrawer from "../components/CartDrawer";
@@ -110,6 +111,7 @@ export default function PublicPage() {
         />
 
         <AboutSection settings={settings} />
+        <ContactSection settings={settings} />
       </main>
 
       <Footer settings={settings} />

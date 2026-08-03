@@ -347,14 +347,13 @@ export default function HeroSection({ settings = {} }) {
         <button
           className="sh-cta"
           onClick={() => {
-            const products =
-              document.getElementById("products") ||
-              document.querySelector("[data-section='products']") ||
-              document.querySelector("main > section:nth-child(2)");
-            if (products) {
-              products.scrollIntoView({ behavior: "smooth" });
+            const target =
+              document.getElementById("collections") ||
+              document.querySelector("[data-section='collections']");
+            if (target) {
+              target.scrollIntoView({ behavior: "smooth" });
             } else {
-              window.scrollBy({ top: window.innerHeight * 0.92, behavior: "smooth" });
+              window.scrollBy({ top: window.innerHeight, behavior: "smooth" });
             }
           }}
         >

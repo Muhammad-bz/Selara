@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { ShoppingBag, X, Menu, Instagram, Facebook } from "lucide-react";
+import { ShoppingBag, X, Menu, Instagram, Facebook, MessageCircle } from "lucide-react";
 import { C, FONT_DISPLAY, FONT_BODY } from "../constants/theme";
 
 /* ═══════════════════════════════════════════════
@@ -345,6 +345,17 @@ const scrollTo = useCallback((id) => {
                   <Facebook size={17} strokeWidth={1.5} />
                 </a>
               )}
+              <a
+                href="https://wa.me/923364231346"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="WhatsApp"
+                style={{ color: textColorDim, transition: "color 0.2s ease" }}
+                onMouseEnter={e => e.currentTarget.style.color = textColor}
+                onMouseLeave={e => e.currentTarget.style.color = textColorDim}
+              >
+                <MessageCircle size={17} strokeWidth={1.5} />
+              </a>
             </div>
             <span style={{
               fontFamily: "'Jost', sans-serif",

@@ -151,8 +151,19 @@ export default function GlobalStyles() {
       }
 
       /* Trust strip */
-      .trust-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
-      @media (max-width: 700px) { .trust-grid { grid-template-columns: repeat(2, 1fr); } }
+      .trust-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        justify-items: center;
+        text-align: center;
+      }
+      @media (max-width: 700px) {
+        .trust-grid {
+          grid-template-columns: repeat(2, 1fr);
+          justify-items: center;
+          text-align: center;
+        }
+      }
 
       /* Section padding */
       .section-pad { padding: 80px 5%; }
