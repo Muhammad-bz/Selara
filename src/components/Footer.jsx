@@ -182,6 +182,26 @@ const Footer = memo(function Footer({ settings = {} }) {
                 @{instagramHandle.replace(/^@/, "")}
               </a>
             )}
+
+            {/* Phone / WhatsApp */}
+            {settings.phone && (
+              <a
+                href={`https://wa.me/${settings.phone.replace(/\D/g, "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "block",
+                  marginTop: 10, textDecoration: "none",
+                  fontFamily: FONT_BODY, fontSize: 13, fontWeight: 300,
+                  color: "rgba(242,196,206,0.55)",
+                  transition: "color 0.2s",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = C.blush; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(242,196,206,0.55)"; }}
+              >
+                {settings.phone}
+              </a>
+            )}
           </div>
 
           {/* Explore */}
