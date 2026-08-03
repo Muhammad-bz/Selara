@@ -16,6 +16,7 @@ import Footer from "../components/Footer";
 import HeroSection        from "../components/HeroSection";
 import TrustStrip         from "../components/TrustStrip";
 import FeaturedSection    from "../components/FeaturedSection";
+import CollectionsSection from "../components/CollectionsSection";
 import AboutSection       from "../components/AboutSection";
 
 // Cart & checkout
@@ -93,6 +94,9 @@ export default function PublicPage() {
           loading={loading}
           error={error}
         />
+
+        {/* ── Shop by Category — CollectionCard grid ── */}
+        <CollectionsSection products={products} loading={loading} />
 
         <AboutSection settings={settings} />
       </main>
